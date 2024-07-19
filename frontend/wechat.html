@@ -116,26 +116,38 @@
             </div>
         </div>
         <script>
-         const ws = new WebSocket('ws://127.0.0.1:3030/chat');
+        //创建一个新的WebSocket连接到服务器地址 
+        const ws = new WebSocket('ws://127.0.0.1:3030/chat');
         
+        //连接建立成功，输出连接成功消息
         ws.onopen = () => {
             console.log('Connected to the server');
         };
         
+        //从websocket接收信息
         ws.onmessage = (event) => {
+            //获取HTML的chatBox_item，用于显示聊天消息
             const chatBox = document.getElementById('chatBox_item');
+            //创建一个新的消息元素，显示来自服务器的消息
             const message = `<div class="message friend_message"><p>${event.data}<br><span>12:15</span></p></div>`;
+            //将消息添加在聊天框的末尾
             chatBox.insertAdjacentHTML('beforeend', message);
         };
 
+        //监听按钮点击
         document.getElementById('button').addEventListener('click', () => {
+            //获取输入框元素，用于输入消息
             const input = document.getElementById('chat_context_item');
+            //获取输入框的消息内容
             const message = input.value;
+            //消息不为空，发生信息给服务器
             if (message) {
                 ws.send(message);
                 const chatBox = document.getElementById('chatBox_item');
+                //创建新的消息元素，显示用户自己发送的信息
                 const myMessage = `<div class="message my_message"><p>${message}<br><span>12:15</span></p></div>`;
                 chatBox.insertAdjacentHTML('beforeend', myMessage);
+                //清空聊天框内容
                 input.value = '';
             }
             /*
