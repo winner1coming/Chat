@@ -25,7 +25,7 @@
                     </ul>
                 </div>
                 <!-- chat list 好友列表 -->
-                <div class="chatlist">
+                <div class="chatlist" id="chatlist">
                     <!-- 第一个 -->
                     <div class="block active">
                         <div class="imgbx">
@@ -115,29 +115,30 @@
                 </div>
             </div>
         </div>
-        <script>
-         const ws = new WebSocket('ws://127.0.0.1:3030/chat');
+        <script src="script.js"></script>
+         <!-- <script>
+        //  const ws = new WebSocket('ws://127.0.0.1:3030/chat');
         
-        ws.onopen = () => {
-            console.log('Connected to the server');
-        };
+        // ws.onopen = () => {
+        //     console.log('Connected to the server');
+        // };
         
-        ws.onmessage = (event) => {
-            const chatBox = document.getElementById('chatBox_item');
-            const message = `<div class="message friend_message"><p>${event.data}<br><span>12:15</span></p></div>`;
-            chatBox.insertAdjacentHTML('beforeend', message);
-        };
+        // ws.onmessage = (event) => {
+        //     const chatBox = document.getElementById('chatBox_item');
+        //     const message = `<div class="message friend_message"><p>${event.data}<br><span>12:15</span></p></div>`;
+        //     chatBox.insertAdjacentHTML('beforeend', message);
+        // };
 
-        document.getElementById('button').addEventListener('click', () => {
-            const input = document.getElementById('chat_context_item');
-            const message = input.value;
-            if (message) {
-                ws.send(message);
-                const chatBox = document.getElementById('chatBox_item');
-                const myMessage = `<div class="message my_message"><p>${message}<br><span>12:15</span></p></div>`;
-                chatBox.insertAdjacentHTML('beforeend', myMessage);
-                input.value = '';
-            }
+        // document.getElementById('button').addEventListener('click', () => {
+        //     const input = document.getElementById('chat_context_item');
+        //     const message = input.value;
+        //     if (message) {
+        //         ws.send(message);
+        //         const chatBox = document.getElementById('chatBox_item');
+        //         const myMessage = `<div class="message my_message"><p>${message}<br><span>12:15</span></p></div>`;
+        //         chatBox.insertAdjacentHTML('beforeend', myMessage);
+        //         input.value = '';
+        //     }
             /*
             // 成功发送
             var send_message = document.getElementById("chatBox_item");
@@ -159,9 +160,9 @@
                 oLi.innerHTML = ans;
                 send_message.append(oLi);
                 message.value = "";
-                */
-            });
-        </script>
+                
+            });*/
+        </script>    -->
         <!-- 加载使用的web图标 -->
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Let's Chat!</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Let's Chat!</h2>
+        <input type="text" id="username" placeholder="Enter your username" required>
+        <button id="loginButton">Login</button>
+    </div>
+    <script>
+        // 登录
+        document.getElementById('loginButton').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('username', username);   // 设置用户名
+                    window.location.href = 'wechat.html';
+                } else {
+                    alert('Username already taken. Please choose another one.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
