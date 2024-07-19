@@ -9,16 +9,18 @@ const chatUserName = document.getElementById('chat_user_name');  // 对方的用
 // const chatUserStatus = document.getElementById('chat_user_status');  // 是否在线
 const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
 
+
+
 ws.onopen = function() {
     console.log('Connected to WebSocket');
 };
 
 // 收到服务器的消息
 ws.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    if (data.type === 'private_message') {
+    const data = JSON.parse(event.data);  // 使用json序列化与反序列化
+    if (data.type === 'private_message') {   // 接收到私聊
         displayNewMessage(data.from, data.message, data.timestamp);
-    } else if (data.type === 'update_users') {
+    } else if (data.type === 'update_users') {  // 更新用户列表
         updateUsersList(data.users);
     }
 };
@@ -78,6 +80,7 @@ function sendMessage() {
     if (message.trim() !== '' && currentChatUser) {
         const timestamp = new Date().toLocaleTimeString();
         displayNewMessage(currentUser, message, timestamp);   // 在己方的对话框显示消息
+        // 发送消息
         ws.send(JSON.stringify({ type: 'private_message', from: currentUser, to: currentChatUser, message, timestamp }));
         messageInput.value = '';  //清空输入框
     }
