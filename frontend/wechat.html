@@ -2,9 +2,6 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-=======
-<html>
-    <head>
         <meta name = "viewport" content="width=device-width,initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>
@@ -12,7 +9,8 @@
         </title>
         <!--引入外部css样式设置文件 -->
         <link rel="stylesheet" type="text/css" href="style.css">
-
+        <script src="chat.js"></script>
+        <script src="script.js"></script>
     </head>
     <body>
         <div class="container">
@@ -29,97 +27,257 @@
                     </ul>
                 </div>
                 <!-- chat list 好友列表 -->
-                <div class="chatlist" id="chatlist">
+                <div class="chatlist" id="chatlistbox">
                     <!-- 第一个 -->
-                    <div class="block active">
-                        <div class="imgbx">
-                            <img src="img1.jpg" class="cover">
-                        </div>
-                        <!-- 显示相关文字信息 -->
-                        <div class="details">
-                            <div class="listhead">
-                                <!-- 显示上线人员的网名 -->
-                                <h4>friend1</h4>
-                                <!-- 显示上线时间 -->
-                                <p class="time">10:56</p>
+                    <ul>
+                        <li>
+                            <div class="block active">
+                                <div class="imgbx">
+                                    <img src="img1.jpg" class="cover">
+                                </div>
+                                <!-- 显示相关文字信息 -->
+                                <div class="details">
+                                    <div class="listhead">
+                                        <!-- 显示上线人员的网名 -->
+                                        <h4>friend1</h4>
+                                        <!-- 显示上线时间 -->
+                                        <p class="time">10:56</p>
+                                    </div>
+                                    <!-- 显示新收到的消息 -->
+                                    <div class="message_p">
+                                        <p>How are you?</p>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- 显示新收到的消息 -->
-                            <div class="message_p">
-                                <p>How are you?</p>
+                        </li>
+                        <li>
+                            <!-- 第二个 -->
+                            <div class="block unread">
+                                <div class="imgbx">
+                                    <img src="img2.jpg" class="cover">
+                                </div>
+                                <!-- 显示相关文字信息 -->
+                                <div class="details">
+                                    <div class="listhead">
+                                        <!-- 显示上线人员的网名 -->
+                                        <h4>friend2</h4>
+                                        <!-- 显示上线时间 -->
+                                        <p class="time">11:56</p>
+                                    </div>
+                                    <!-- 显示新收到的消息 -->
+                                    <div class="message_p" id="newmessage">
+                                        <p>How are you?--------</p>
+                                        <b>1</b>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- 第二个 -->
-                    <div class="block unread">
-                        <div class="imgbx">
-                            <img src="img2.jpg" class="cover">
-                        </div>
-                        <!-- 显示相关文字信息 -->
-                        <div class="details">
-                            <div class="listhead">
-                                <!-- 显示上线人员的网名 -->
-                                <h4>friend2</h4>
-                                <!-- 显示上线时间 -->
-                                <p class="time">11:56</p>
+                        </li>
+                        <li>
+                            <!-- 群聊 第三个 -->
+                            <div class="block active" id = "block_item_3">
+                                <div class="imgbx">
+                                    <img src="img3.jpg" class="cover">
+                                </div>
+                                <!-- 显示相关文字信息 -->
+                                <div class="details">
+                                    <div class="listhead">
+                                        <!-- 显示上线人员的网名 -->
+                                        <h4>群聊</h4>
+                                        <!-- 显示上线时间 -->
+                                        <p class="time">11:56</p>
+                                    </div>
+                                    <!-- 显示新收到的消息 -->
+                                    <div class="message_p">
+                                        <p>How are you?--------</p>
+                                        <b>3</b>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- 显示新收到的消息 -->
-                            <div class="message_p">
-                                <p>How are you?--------</p>
-                                <b>1</b>
-                            </div>
-                        </div>
-                    </div>
+                        </li>
+                    </ul> 
                 </div>
             </div>
 
             <!-- 右侧聊天界面设置 -->
             <div class="rightSide" id ="rightSide_item">
-                <div class ="header">
-                    <div class="imgText">
-                        <div class = "userimg">
-                            <img src = "img1.jpg" class="cover">
+                <div class="chatcontent" id= "chatcontent_1" style="display: block;">
+                    <div class ="header">
+                        <div class="imgText">
+                            <div class = "userimg">
+                                <img src = "img1.jpg" class="cover">
+                            </div>
+                            <h4>friend1<br><span>Online</span></h4>
                         </div>
-                        <h4>friend1<br><span>Online</span></h4>
+                        <!-- <ul class="nav_icons">
+                            <li>
+                                <ion-icon name="chatbubble-ellipses"></ion-icon>
+                            </li>
+                        </ul>   -->
                     </div>
-                    <ul class="nav_icons">
-                        <li>
-                            <ion-icon name="chatbubble-ellipses"></ion-icon>
-                        </li>
-                    </ul>  
+                    <!-- chatbox -->
+                    <div class = "chatBox" id="chatBox_item">
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message friend_message">
+                            <p>Hello<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                    </div>
+                    <!-- 输入框 -->
+                    <div class="chatbox_input" id="chatbox_input_item">
+                        <ion-icon name="happy-outline"></ion-icon>
+                        <textarea class ="chat_context" id = "chat_context_item" cols="20" rows="10" placeholder="please input ...."></textarea>
+                        <div class="chat_commit" id = "button">发送</div>
+                    </div>
                 </div>
-                <!-- chatbox -->
-                <div class = "chatBox" id="chatBox_item">
-                    <div class = "message my_message">
-                        <p>Hi<br><span>12:15</span></p>
+                <!-- 第二个聊天内容界面 -->
+                <div class="chatcontent" id="chatcontent_2" style="display: none;">
+                    <div class ="header">
+                        <div class="imgText">
+                            <div class = "userimg">
+                                <img src = "img2.jpg" class="cover">
+                            </div>
+                            <h4>friend2<br><span>Online</span></h4>
+                        </div>
+                        <!-- <ul class="nav_icons">
+                            <li>
+                                <ion-icon name="chatbubble-ellipses"></ion-icon>
+                            </li>
+                        </ul>   -->
                     </div>
-                    <div class = "message friend_message">
-                        <p>Hello<br><span>12:15</span></p>
+                    <!-- chatbox -->
+                    <div class = "chatBox" id="chatBox_item">
+                        <div class = "message my_message">
+                            <p>你好<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message friend_message">
+                            <p>Hello<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
                     </div>
-                    <div class = "message my_message">
-                        <p>Hi<br><span>12:15</span></p>
-                    </div>
-                    <div class = "message my_message">
-                        <p>Hi<br><span>12:15</span></p>
-                    </div>
-                    <div class = "message my_message">
-                        <p>Hi<br><span>12:15</span></p>
-                    </div>
-                    <div class = "message my_message">
-                        <p>Hi<br><span>12:15</span></p>
-                    </div>
-                    <div class = "message my_message">
-                        <p>Hi<br><span>12:15</span></p>
+                    <!-- 输入框 -->
+                    <div class="chatbox_input" id="chatbox_input_item">
+                        <ion-icon name="happy-outline"></ion-icon>
+                        <textarea class ="chat_context" id = "chat_context_item" cols="20" rows="10" placeholder="please input ...."></textarea>
+                        <div class="chat_commit" id = "button">发送</div>
                     </div>
                 </div>
-                <!-- 输入框 -->
-                <div class="chatbox_input" id="chatbox_input_item">
-                    <ion-icon name="happy-outline"></ion-icon>
-                    <textarea class ="chat_context" id = "chat_context_item" cols="20" rows="10" placeholder="please input ...."></textarea>
-                    <div class="chat_commit" id = "button">发送</div>
+                <!--第三个聊天界面  -->
+                <div class="chatcontent" id="chatcontent_3" style="display: none;">
+                    <div class ="header">
+                        <div class="imgText">
+                            <div class = "userimg">
+                                <img src = "img3.jpg" class="cover">
+                            </div>
+                            <h4>群聊<br><span>Online</span></h4>
+                        </div>
+                        <!-- <ul class="nav_icons">
+                            <li>
+                                <ion-icon name="chatbubble-ellipses"></ion-icon>
+                            </li>
+                        </ul>   -->
+                    </div>
+                    <!-- chatbox -->
+                    <div class = "chatBox" id="chatBox_item">
+                        <div class = "message my_message">
+                            <div class="righimg">
+                                <img src="userimg.jpg" class="cover">
+                            </div>
+                            <p>这是第一条群聊消息<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message friend_message">
+                            <p>Hello<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        <div class = "message my_message">
+                            <p>Hi<br><span>12:15</span></p>
+                        </div>
+                        
+                    </div>
+                    <!-- 输入框 -->
+                    <div class="chatbox_input" id="chatbox_input_item">
+                        <ion-icon name="happy-outline"></ion-icon>
+                        <textarea class ="chat_context" id = "chat_context_item" cols="20" rows="10" placeholder="please input ...."></textarea>
+                        <div class="chat_commit" id = "button">发送</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <script src="script.js"></script>
+        <script>
+            // 成功发送
+            var send_message = document.getElementById("chatBox_item");
+            var domBtm = document.getElementById("button");
+            // 发送内容
+            var message = document.getElementById("chat_context_item");
+            domBtm.addEventListener("click",function(){
+                var str = message.value;
+                var date = new Date();
+                var hour = date.getHours();
+                
+                var mm = date.getMinutes();
+                var time = hour+':'+ mm;
+                var ans = 
+                        '<div class = "message my_message"><p>'+str+'<br><span>'+time+'</span></p></div>'
+                        ;
+                var oLi = document.createElement("div")
+                oLi.setAttribute("class","my_message");
+                oLi.innerHTML = ans;
+                send_message.append(oLi);
+                message.value = "";
+            });
+        </script>
         <!-- 加载使用的web图标 -->
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

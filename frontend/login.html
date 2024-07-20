@@ -29,9 +29,13 @@
             console.log('Connected to WebSocket');
         };
         ws.onmessage = function(event){
+            console.log('收到消息')  // todo: debug
             const data = JSON.parse(event.data);  // data中有success(bool)和username(string)
             if (data.success) {
                     localStorage.setItem('username', data.username);   // 设置用户名
+                    // // // 每更新登录一个用户，都要更新用户列表 todo(改为服务端在新用户上线时自动更新)
+                    // ws.send(JSON.stringify({ 
+                    //     "type": 'update_users'}));
                     window.location.href = 'wechat.html';  // todo
                 } else {
                     alert('Username already taken. Please choose another one.');

@@ -19,23 +19,25 @@ async fn main() {
     // 创建一个 `users` 过滤器，用于将 `users` 传递给 Warp 处理函数。
     let users_filter = warp::any().map(move || users.clone());
 
-    // 定义聊天 WebSocket 路径的处理函数。
-    let chat = warp::path("chat")
-        .and(warp::ws())
-        .and(users_filter.clone())
-        .map(|ws: warp::ws::Ws, users| {
-            // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
-            ws.on_upgrade(move |socket| user_connected(socket, users))
-        });
-
     // 定义登录 WebSocket 路径的处理函数。
     let login = warp::path("login")
         .and(warp::ws())
-        .and(users_filter)
+        .and(users_filter.clone())
         .map(|ws: warp::ws::Ws, users| {
             // 当 WebSocket 连接升级时，调用 `handle_login` 函数。
             ws.on_upgrade(move |socket| handle_login(socket, users))
         });
+
+    // 定义聊天 WebSocket 路径的处理函数。
+    let chat = warp::path("chat")
+    .and(warp::ws())
+    .and(users_filter.clone())
+    .map(|ws: warp::ws::Ws, users| {
+        // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
+        ws.on_upgrade(move |socket| user_connected(socket, users))
+    });
+    println!("你有进入到这个界面吗？？");
+
 
     // 启动 Warp 服务器，监听 3030 端口。
     warp::serve(login.or(chat)).run(([127, 0, 0, 1], 3030)).await;
@@ -111,7 +113,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
         }
     }
     // 用户断开连接时，从用户列表中移除该用户。
-    users.lock().await.remove(&Name);
+    //users.lock().await.remove(&Name);
 }
 
 async fn handle_login(ws: WebSocket, users: Users) {
