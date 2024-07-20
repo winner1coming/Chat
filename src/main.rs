@@ -15,6 +15,11 @@ type add_user = Arc<tokio::sync::Mutex<HashMap<String, mpsc::UnboundedSender<Res
 async fn main() {
     // 初始化 `users`，这是一个共享的、线程安全的用户列表。
     let users = Arc::new(tokio::sync::Mutex::new(HashMap::new()));
+    // 添加 "Group" 用户到用户列表
+    let mut user_lock = users.lock().await;
+    let (group_tx, _group_rx) = mpsc::unbounded_channel();
+    user_lock.insert("Group".to_string(), group_tx);
+    drop(user_lock); // 确保释放锁
     
     // 创建一个 `users` 过滤器，用于将 `users` 传递给 Warp 处理函数。
     let users_filter = warp::any().map(move || users.clone());
@@ -72,7 +77,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
     });
 
     // 为新连接的用户生成一个用户名（在实际应用中，这应该从客户端获取）。
-    let mut Name ="".to_string();
+    let mut Name ="".to_string();   
 
     // 处理来自 WebSocket 的消息。
     while let Some(result) = user_ws_rx.next().await {
@@ -101,12 +106,11 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                         println!("目前的用户是{}", username);
                         let mut user_lock = users.lock().await;
                         user_lock.insert(username.to_string(), tx.clone());
-                        let names: Vec<String> = user_lock.keys().cloned().collect();
-                
+                        let name : Vec<String>= user_lock.keys().cloned().collect();
                         // 设置广播信息
                         let add_msg = serde_json::json!({
                             "type": "add_user",
-                            "users": names
+                            "users": name
                         });
                         for (user, user_tx) in user_lock.iter(){
                         if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
