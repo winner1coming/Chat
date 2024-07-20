@@ -29,7 +29,7 @@
                 <div class="chatlist" id="chatlistbox">
                     <!-- 第一个 -->
                     <ul>
-                        <li>
+                        <li id = "0">
                             <div class="block active">
                                 <div class="imgbx">
                                     <img src="img1.jpg" class="cover">
@@ -49,7 +49,7 @@
                                 </div>
                             </div>
                         </li>
-                        <li>
+                        <li id = "1">
                             <!-- 第二个 -->
                             <div class="block unread">
                                 <div class="imgbx">
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                         </li>
-                        <li>
+                        <li id = "2">
                             <!-- 群聊 第三个 -->
                             <div class="block active" id = "block_item_3">
                                 <div class="imgbx">
@@ -99,7 +99,7 @@
 
             <!-- 右侧聊天界面设置 -->
             <div class="rightSide" id ="rightSide_item">
-                <div class="chatcontent" id= "chatcontent_1" style="display: block;">
+                <div class="chatcontent" id= "chatcontent_0" style="display: block;">
                     <div class ="header">
                         <div class="imgText">
                             <div class = "userimg">
@@ -107,11 +107,6 @@
                             </div>
                             <h4>friend1<br><span>Online</span></h4>
                         </div>
-                        <!-- <ul class="nav_icons">
-                            <li>
-                                <ion-icon name="chatbubble-ellipses"></ion-icon>
-                            </li>
-                        </ul>   -->
                     </div>
                     <!-- chatbox -->
                     <div class = "chatBox" id="chatBox_item">
@@ -157,7 +152,7 @@
                     </div>
                 </div>
                 <!-- 第二个聊天内容界面 -->
-                <div class="chatcontent" id="chatcontent_2" style="display: none;">
+                <div class="chatcontent" id="chatcontent_1" style="display: none;">
                     <div class ="header">
                         <div class="imgText">
                             <div class = "userimg">
@@ -165,11 +160,6 @@
                             </div>
                             <h4>friend2<br><span>Online</span></h4>
                         </div>
-                        <!-- <ul class="nav_icons">
-                            <li>
-                                <ion-icon name="chatbubble-ellipses"></ion-icon>
-                            </li>
-                        </ul>   -->
                     </div>
                     <!-- chatbox -->
                     <div class = "chatBox" id="chatBox_item">
@@ -203,7 +193,7 @@
                     </div>
                 </div>
                 <!--第三个聊天界面  -->
-                <div class="chatcontent" id="chatcontent_3" style="display: none;">
+                <div class="chatcontent" id="chatcontent_2" style="display: none;">
                     <div class ="header">
                         <div class="imgText">
                             <div class = "userimg">
@@ -211,11 +201,6 @@
                             </div>
                             <h4>群聊<br><span>Online</span></h4>
                         </div>
-                        <!-- <ul class="nav_icons">
-                            <li>
-                                <ion-icon name="chatbubble-ellipses"></ion-icon>
-                            </li>
-                        </ul>   -->
                     </div>
                     <!-- chatbox -->
                     <div class = "chatBox" id="chatBox_item">
@@ -226,24 +211,47 @@
                             <p>这是第一条群聊消息<br><span>12:15</span></p>
                         </div>
                         <div class = "message friend_message">
+                            <div class="leftimg">
+                                <img src="img1.jpg" class="cover">
+                            </div>
                             <p>Hello<br><span>12:15</span></p>
                         </div>
                         <div class = "message my_message">
+                            <div class="righimg">
+                                <img src="userimg.jpg" class="cover">
+                            </div>
                             <p>Hi<br><span>12:15</span></p>
                         </div>
                         <div class = "message my_message">
+                            <div class="righimg">
+                                <img src="userimg.jpg" class="cover">
+                            </div>
                             <p>Hi<br><span>12:15</span></p>
                         </div>
                         <div class = "message my_message">
+                            <div class="righimg">
+                                <img src="userimg.jpg" class="cover">
+                            </div>
                             <p>Hi<br><span>12:15</span></p>
                         </div>
                         <div class = "message my_message">
+                            <div class="righimg">
+                                <img src="userimg.jpg" class="cover">
+                            </div>
                             <p>Hi<br><span>12:15</span></p>
                         </div>
                         <div class = "message my_message">
+                            <div class="righimg">
+                                <img src="userimg.jpg" class="cover">
+                            </div>
                             <p>Hi<br><span>12:15</span></p>
                         </div>
-                        
+                        <div class = "message friend_message">
+                            <div class="leftimg">
+                                <img src="img2.jpg" class="cover">
+                            </div>
+                            <p>有人吗<br><span>14:50</span></p>
+                        </div>                       
                     </div>
                     <!-- 输入框 -->
                     <div class="chatbox_input" id="chatbox_input_item">

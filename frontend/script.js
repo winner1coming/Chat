@@ -167,6 +167,7 @@ function sendMessage() {
             var message_type = 'private_message';
         }
         // 发送消息
+
         ws_chat.send(JSON.stringify({ 
             "type": message_type,
             "from": currentUser, 
