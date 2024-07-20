@@ -59,36 +59,36 @@ ws_chat.onmessage = function(event) {
 };
 
 // 增加新用户
-function addUser(user){
+function addUser(users){
     console.log('有新用户上线') 
-    users.forEach(user => {
-        if (user !== currentUser && user_list.find(user)==-1) {
-            const userBlock = document.createElement('li');
-            userBlock.innerHTML = `
-                <div class="block active">
-                    <!-- 头像 -->
-                    <div class="imgbx">
-                        <img src="img1.jpg" class="cover">
-                    </div>
-                    <div class="details">
-                        <div class="listhead">
-                            <!-- 显示上线人员的网名 -->
-                            <h4>${user}</h4>
-                            <!-- 显示消息时间 -->
-                            <p class="time"></p>
+    users.forEach(function (user) {
+        if (user !== currentUser)
+            if(!user_list.length || (user_list.length && user_list.indexOf(user)==-1)) {
+                const userBlock = document.createElement('li');
+                userBlock.innerHTML = `
+                    <div class="block active">
+                        <!-- 头像 -->
+                        <div class="imgbx">
+                            <img src="img1.jpg" class="cover">
                         </div>
-                        <!-- 显示新收到的消息 -->
-                        <div class="message_p">
-                            <p></p>    <!--内容-->
-                            <b></b>    <!--1表示为读-->
+                        <div class="details">
+                            <div class="listhead">
+                                <!-- 显示上线人员的网名 -->
+                                <h4>${user}</h4>
+                                <!-- 显示消息时间 -->
+                                <p class="time"></p>
+                            </div>
+                            <!-- 显示新收到的消息 -->
+                            <div class="message_p">
+                                <p></p>    <!--内容-->
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-            userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
-            chatlist.firstElementChild.appendChild(userBlock);
-            user_list.push(user);
-        }
+                `;
+                userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
+                chatlist.firstElementChild.appendChild(userBlock);
+                user_list.push(user);
+            }
     })
 }
 
