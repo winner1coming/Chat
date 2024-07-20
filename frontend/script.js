@@ -112,10 +112,11 @@ function selectUser(user, userBlock) {
         // chatUserName.innerText = user;  
         // chatUserStatus.innerText = 'Online';
         // chatUserImg.src = 'default.jpg';
-        if(chatHistory[currentChatUser]){
-            chatBox.innerHTML = chatHistory[currentChatUser].innerHTML;
-        }
-        else{
+        if (chatHistory[currentChatUser]) {
+            chatHistory[currentChatUser].forEach(messageHTML => {
+                chatBox.innerHTML += messageHTML;
+            });
+        }else{
             chatBox.innerHTML = '';
         }
         //切换名字
@@ -138,13 +139,10 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         var peerUser = sendUser;  // 对方
     }
     // 增加到对应的聊天历史里
-    if(chatHistory[peerUser]){
-        chatHistory[peerUser].appendChild(messageDiv);
-    }else{
-        let history = document.createElement('div');
-        history.appendChild(messageDiv)
-        chatHistory[peerUser] = history;
+    if (!chatHistory[peerUser]) {
+        chatHistory[peerUser] = [];
     }
+    chatHistory[peerUser].push(messageDiv.outerHTML);
     
     // 在用户列表里显示新消息，
     // 拿到所有的用户块（用户块下有子节点用户名和消息时间
