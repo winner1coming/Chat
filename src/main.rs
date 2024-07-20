@@ -150,6 +150,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                                 eprintln!("Failed to broadcast user list to {}:{}",user,e);
                             }
                         }
+                        
                     }
                 }
             }
