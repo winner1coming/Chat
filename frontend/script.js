@@ -32,7 +32,8 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 // const chatUserStatus = document.getElementById('chat_user_status');  // 是否在线
 // const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
 
-let chatHistory = new Array() // 保存聊天记录，{usersname(String): html标签}
+let chatHistory = new Array(); // 保存聊天记录，{usersname(String): html标签}
+let user_list = new Array();  
 
 // // todo test
 // let userBlock = chatlist.firstElementChild.firstElementChild;
@@ -50,48 +51,45 @@ ws_chat.onopen = function() {
 // 收到服务器的消息
 ws_chat.onmessage = function(event) {
     const data = JSON.parse(event.data);  // 使用json序列化与反序列化
-    console.log('收到消息')  // todo: debug
-    console.log(data)  // todo: debug
     if (data["type"] === 'private_message' || data["type"] === 'public_message') {   // 接收到信息
         boxAddMessage(data["from"], currentUser, data["message"], data["timestamp"]);
     }else if(data["type"] === 'add_user'){
-        addUser(data["user"]);
+        addUser(data["users"]);
     }
-    // } else if (data["type"] === 'update_users') {  // 更新用户列表
-    //     console.log('即将更新用户列表')  // todo: debug
-    //     updateUsersList(data["users"]);
-    // }
 };
 
 // 增加新用户
 function addUser(user){
     console.log('有新用户上线') 
-    if (user !== currentUser) {
-        const userBlock = document.createElement('li');
-        userBlock.innerHTML = `
-            <div class="block active">
-                <!-- 头像 -->
-                <div class="imgbx">
-                    <img src="img1.jpg" class="cover">
-                </div>
-                <div class="details">
-                    <div class="listhead">
-                        <!-- 显示上线人员的网名 -->
-                        <h4>${user}</h4>
-                        <!-- 显示消息时间 -->
-                        <p class="time"></p>
+    users.forEach(user => {
+        if (user !== currentUser && user_list.find(user)==-1) {
+            const userBlock = document.createElement('li');
+            userBlock.innerHTML = `
+                <div class="block active">
+                    <!-- 头像 -->
+                    <div class="imgbx">
+                        <img src="img1.jpg" class="cover">
                     </div>
-                    <!-- 显示新收到的消息 -->
-                    <div class="message_p">
-                        <p></p>    <!--内容-->
-                        <b></b>    <!--1表示为读-->
+                    <div class="details">
+                        <div class="listhead">
+                            <!-- 显示上线人员的网名 -->
+                            <h4>${user}</h4>
+                            <!-- 显示消息时间 -->
+                            <p class="time"></p>
+                        </div>
+                        <!-- 显示新收到的消息 -->
+                        <div class="message_p">
+                            <p></p>    <!--内容-->
+                            <b></b>    <!--1表示为读-->
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
-        chatlist.firstElementChild.appendChild(userBlock);
-    }
+            `;
+            userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
+            chatlist.firstElementChild.appendChild(userBlock);
+            user_list.push(user);
+        }
+    })
 }
 
 // 选择要聊天的用户
@@ -161,7 +159,6 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
 function sendMessage() {
     const message = messageInput.value;
     if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
-        console.log('发送消息'+message);  // todo debug
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
         if(currentChatUser === "群聊"){
