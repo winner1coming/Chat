@@ -10,7 +10,6 @@ window.onload = function(){
     var outerDivs = [];
     if(parentDiv)
     {
-        
         var children = parentDiv.childNodes;
         var outerDiv = parentDiv.querySelectorAll(":scope > div");
         for (var i = 0; i < children.length; i++) {
