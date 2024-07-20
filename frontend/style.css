@@ -297,7 +297,7 @@ body
     justify-content: flex-end;
 }
 
-.my_message .rightimg
+.rightimg
 {
     position: absolute;
     right: 0px;

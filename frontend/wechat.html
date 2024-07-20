@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-=======
 <html>
     <head>
         <meta name = "viewport" content="width=device-width,initial-scale=1.0">
@@ -30,11 +26,7 @@
                     </ul>
                 </div>
                 <!-- chat list 好友列表 -->
-<<<<<<< HEAD:wechat.html
                 <div class="chatlist" id="chatlistbox">
-=======
-                <div class="chatlist" id="chatlist">
->>>>>>> ca907e5b104b431e64dd6a8477ae9808cd0d018b:frontend/wechat.html
                     <!-- 第一个 -->
                     <ul>
                         <li>
@@ -228,7 +220,7 @@
                     <!-- chatbox -->
                     <div class = "chatBox" id="chatBox_item">
                         <div class = "message my_message">
-                            <div class="rightimg">
+                            <div class="righimg">
                                 <img src="img1.jpg" class="cover">
                             </div>
                             <p>这是第一条群聊消息<br><span>12:15</span></p>
@@ -262,7 +254,29 @@
                 </div>
             </div>
         </div>
-        <script src="script.js"></script>
+        <script>
+            // 成功发送
+            var send_message = document.getElementById("chatBox_item");
+            var domBtm = document.getElementById("button");
+            // 发送内容
+            var message = document.getElementById("chat_context_item");
+            domBtm.addEventListener("click",function(){
+                var str = message.value;
+                var date = new Date();
+                var hour = date.getHours();
+                
+                var mm = date.getMinutes();
+                var time = hour+':'+ mm;
+                var ans = 
+                        '<div class = "message my_message"><p>'+str+'<br><span>'+time+'</span></p></div>'
+                        ;
+                var oLi = document.createElement("div")
+                oLi.setAttribute("class","my_message");
+                oLi.innerHTML = ans;
+                send_message.append(oLi);
+                message.value = "";
+            });
+        </script>
         <!-- 加载使用的web图标 -->
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
