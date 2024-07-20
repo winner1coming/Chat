@@ -21,15 +21,18 @@ const ws = new WebSocket('ws://127.0.0.1:3030/chat');
 let currentUser = localStorage.getItem('username');  // 自己的用户名
 let currentChatUser = null;   // 当前聊天的用户
 
-const chatlist = document.getElementById('chatlist');  // 好友列表
+const chatlist = document.getElementById('chatlistbox');  // 好友列表
 const chatBox = document.getElementById('chatBox_item');  // 右侧的聊天消息框
 const messageInput = document.getElementById('chat_context_item');  // 输入框
-const chatUserName = document.getElementById('chat_user_name');  // 对方的用户名
+// const chatUserName = document.getElementById('chat_user_name');  // 对方的用户名
 // const chatUserStatus = document.getElementById('chat_user_status');  // 是否在线
-const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
+// const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
 
 let chatHistory = new Array() // 保存聊天记录，{usersname(String): html标签}
 
+// todo test
+let userBlock = chatlist.firstElementChild.firstElementChild;
+userBlock.addEventListener('click', () => selectUser("user", userBlock));
 
 
 ws.onopen = function() {
@@ -56,61 +59,32 @@ ws.onmessage = function(event) {
 function addUser(user){
     console.log('有新用户上线') 
     if (user !== currentUser) {
-        const userBlock = document.createElement('div');
-        userBlock.className = 'block active';
+        const userBlock = document.createElement('li');
         userBlock.innerHTML = `
-            <!-- 头像 -->
-            <div class="imgbx">
-                <img src="img1.jpg" class="cover">
-            </div>
-            <div class="details">
-                <div class="listhead">
-                    <!-- 显示上线人员的网名 -->
-                    <h4>${user}</h4>
-                    <!-- 显示消息时间 -->
-                    <p class="time"></p>
+            <div class="block active">
+                <!-- 头像 -->
+                <div class="imgbx">
+                    <img src="img1.jpg" class="cover">
                 </div>
-                 <!-- 显示新收到的消息 -->
-                <div class="message_p">
-                    <p></p>    <!--内容-->
-                    <b></b>    <!--1表示为读-->
+                <div class="details">
+                    <div class="listhead">
+                        <!-- 显示上线人员的网名 -->
+                        <h4>${user}</h4>
+                        <!-- 显示消息时间 -->
+                        <p class="time"></p>
+                    </div>
+                    <!-- 显示新收到的消息 -->
+                    <div class="message_p">
+                        <p></p>    <!--内容-->
+                        <b></b>    <!--1表示为读-->
+                    </div>
                 </div>
             </div>
         `;
-        userBlock.addEventListener('click', () => selectUser(user, userBlock));
-        chatlist.appendChild(userBlock);
+        // userBlock.addEventListener('click', () => selectUser(user, userBlock));  todo 冲突
+        chatlist.firstElementChild.appendChild(userBlock);
     }
 }
-
-// // 更新用户列表
-// function updateUsersList(users) {
-//     console.log('更新用户列表');
-//     chatlist.innerHTML = '';
-//     users.forEach(user => {
-//         if (user !== currentUser) {
-//             const userBlock = document.createElement('div');
-//             userBlock.className = 'block active';
-//             userBlock.innerHTML = `
-//                 <!-- 头像 -->
-//                 <div class="imgbx">
-//                     <img src="img1.jpg" class="cover">
-//                 </div>
-//                 <div class="details">
-//                     <div class="listhead">
-//                         <h4>${user}</h4>
-//                     </div>
-//                      <!-- 显示新收到的消息 -->
-//                     <div class="message_p">
-//                         <p></p>   
-//                         <b></b>    <!--1表示为读-->
-//                     </div>
-//                 </div>
-//             `;
-//             userBlock.addEventListener('click', () => selectUser(user, userBlock));
-//             chatlist.appendChild(userBlock);
-//         }
-//     });
-// }
 
 // 选择要聊天的用户
 function selectUser(user, userBlock) {
@@ -122,9 +96,9 @@ function selectUser(user, userBlock) {
         userBlock.querySelector('.message_p').firstElementChild.nextElementSibling = ''
     }
     currentChatUser = user;
-    chatUserName.innerText = user;  
+    // chatUserName.innerText = user;  
     // chatUserStatus.innerText = 'Online';
-    chatUserImg.src = 'default.jpg';
+    // chatUserImg.src = 'default.jpg';
     if(!chatHistory && chatHistory.find(currentChatUser)){
         chatBox.innerHTML = chatHistory[currentChatUser];
     }
