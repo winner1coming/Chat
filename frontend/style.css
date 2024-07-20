@@ -43,7 +43,7 @@ body
     flex: 70%;
     background: #e3edf3;
     /* overflow: auto;
-    max-height: calc(100%-120px); */
+    max-height: calc(100%); */
 }
 .container .rightSide::before
 {
@@ -88,7 +88,6 @@ body
     width: 100%;
     height: 100%;
     object-fit: cover;
-
 }
 
 /* web标签的使用格式 */
@@ -196,6 +195,7 @@ body
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .message_p b
 {
     background:#41baee;
@@ -228,13 +228,21 @@ body
    color:#555 ;
 }
 
+.chatcontent
+{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
 .chatBox
 {
     position: relative;
     width: 100%;
+    overflow: auto;
     height: calc(100% - 260px);
     padding: 50px;
-    overflow-y: auto;
 }
 
 .message 
@@ -242,19 +250,28 @@ body
     position: relative;
     display: flex;
     width: 100%;
-    margin: 5px 0;
+    margin: 10px 0px;
+    
 }
 .message p
 {
     position: relative;
-    right: 0;
+    /* 消息文字到右侧的距离 */
+    right: 40px;
     text-align: right;
     max-width: 65%;
     padding: 12px;
     background: #acc3cd;
     border-radius: 10px;
     font-size: 0.9em;
-
+}
+.message img{
+    position: relative;
+    min-width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-left: 0px;
 }
 .message p::before
 {
@@ -279,6 +296,13 @@ body
 {
     justify-content: flex-end;
 }
+
+/* .rightimg
+{
+    position: absolute;
+    right: 0px;
+    top:0px
+} */
 .friend_message
 {
     justify-content: flex-start;
@@ -362,16 +386,3 @@ body
     font-weight: 500k;
 }
 
-
-/* .chatbox_input input
-{
-    width: 90%;
-    margin:0 20px;
-    padding: 10px 20px;
-    border:none;
-    outline: none;
-    border-radius: 30px;
-    font-size: 1em;
-    position: relative;
-
-} */
