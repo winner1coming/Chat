@@ -150,7 +150,6 @@ async fn handle_login(ws: WebSocket, users: Users) {
                             let response = serde_json::json!({
                                 "type": "login_response",
                                 "success": false,
-                                "username": username
                             });
                             // 发送登录失败响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
@@ -161,7 +160,8 @@ async fn handle_login(ws: WebSocket, users: Users) {
                             users_lock.insert(username.to_string(), tx.clone());
                             let response = serde_json::json!({
                                 "type": "login_response",
-                                "success": true
+                                "success": true,
+                                "username": username
                             });
                             // 发送登录成功响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
