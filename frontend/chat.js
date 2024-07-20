@@ -20,6 +20,7 @@ window.onload = function(){
         }
     }
     // alert(outerDivs.length);
+    //聊天界面切换
     for(var i = 0; i<titleName.length;i++)
     {
         titleName[i].id = i;

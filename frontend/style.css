@@ -257,7 +257,7 @@ body
 {
     position: relative;
     /* 消息文字到右侧的距离 */
-    right: 80px;
+    right: 40px;
     text-align: right;
     max-width: 65%;
     padding: 12px;
@@ -271,7 +271,7 @@ body
     height: 40px;
     overflow: hidden;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-left: 0px;
 }
 .message p::before
 {
@@ -297,14 +297,12 @@ body
     justify-content: flex-end;
 }
 
-.rightimg
+/* .rightimg
 {
     position: absolute;
     right: 0px;
     top:0px
-    /* bottom: 10px; */
-
-}
+} */
 .friend_message
 {
     justify-content: flex-start;
