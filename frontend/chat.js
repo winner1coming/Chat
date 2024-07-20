@@ -27,6 +27,10 @@ window.onload = function(){
         // 内容的显示与隐藏
         titleName[i].onclick = function()
         {
+            // 消除新消息气泡提示
+            var b_label = titleName[this.id].getElementsByTagName("b")[0];
+            b_label.style.display = "none";
+            // 显示对应的页面
             for( var j=0 ;j<titleName.length;j++)
             {
                 outerDivs[j].style.display = "none";
