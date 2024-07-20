@@ -78,19 +78,36 @@ async fn user_connected(ws: WebSocket, users: add_user) {
         if let Ok(msg_str) = message.to_str() {
             if let Ok(client_message) = serde_json::from_str::<Value>(msg_str) {
                 // 处理私聊消息。
-                let username = client_message["from"].to_string();
+                /*let username = client_message["from"].to_string();
                 Name = username.clone();
                 println!("目前的用户是：{}",Name);
                 // 将新用户及其 `UnboundedSender` 添加到用户列表中。
                 users.lock().await.insert(username.clone(), tx.clone());
                 for (user,tx) in users.lock().await.iter(){
                     println!("所有的用户名：{}",user);
-                }
-                if client_message["type"] == "private_message" {
+                }*/
+                if client_message["type"] == "add_user" {
+                    let username = client_message["username"].to_string();
+                    Name = username.clone();
+                    println!("目前的用户是{}",Name);
+                    let mut user_lock = users.lock().await;
+                    user_lock.insert(Name, tx.clone());
+
+                    //设置广播信息
+                    let add_msg = serde_json::json!({
+                        "type" : "add_user",
+                        "user": username
+                    });
+                    for (user, user_tx) in user_lock.iter(){
+                        if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
+                            eprintln!("Failed to broadcast user list to {}:{}",user,e);
+                        }
+                    }
+                }else if client_message["type"] == "private_message" {
                     if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
                         let new_msg = serde_json::json!({
                             "type": "private_message",
-                            "from": username,
+                            "from": client_message["from"].as_str(),
                             "message": msg,
                             "timestamp": client_message["timestamp"].as_str().unwrap_or("")
                         });
@@ -100,25 +117,39 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                             let _ = tx.send(Ok(Message::text(new_msg.to_string())));
                         }
                     }
-                } else if client_message["type"] == "update_users" {
-                    // 处理用户列表更新消息。//为了公聊而设置的
-                    let users_list: Vec<String> = users.lock().await.keys().cloned().collect();
-                    let update_msg = serde_json::json!({
-                        "type" : "update_users",
-                        "users": users_list
-                    });
-                    let _ = tx.send(Ok(Message::text(update_msg.to_string())));
+                } else if client_message["type"] == "public_message" {
+                    if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
+                        let new_msg = serde_json::json!({
+                            "type": "p_message",
+                            "from": client_message["from"].as_str(),
+                            "message": msg,
+                            "timestamp": client_message["timestamp"].as_str().unwrap_or("")
+                        });
+
+                        let users_lock = users.lock().await;  // 获取 users 的锁
+
+                        // 将消息发送给指定的接收者
+                        if let Some(user_tx) = users_lock.get(to) {
+                            if let Err(e) = user_tx.send(Ok(Message::text(new_msg.to_string()))) {
+                                eprintln!("Failed to send public message to {}: {}", to, e);
+                            }
+                        }
+                        //所有用户都要收到
+                        for (user, user_tx) in users_lock.iter(){
+                            if let Err(e) = user_tx.send(Ok(Message::text(new_msg.to_string()))){
+                                eprintln!("Failed to broadcast user list to {}:{}",user,e);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-    // 用户断开连接时，从用户列表中移除该用户。
-    //users.lock().await.remove(&username);
 }
 
 async fn handle_login(ws: WebSocket, users: add_user) {
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
-    let (tx, mut rx) = mpsc::unbounded_channel();
+    let (tx, mut rx) = mpsc::unbounded_channel::<Result<Message, warp::Error>>();
 
     // 启动一个异步任务，用于将消息从通道发送到 WebSocket。
     tokio::task::spawn(async move {
@@ -158,14 +189,13 @@ async fn handle_login(ws: WebSocket, users: add_user) {
                                 "success": false,
                                 "username": username
                             });
-
                             // 发送登录失败响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
                                 eprintln!("Failed to send login_response message: {}", e);
                             }
                         } else {
                             // 用户名不存在，允许登录并更新用户列表。
-                            users_lock.insert(username.to_string(), tx.clone());
+                            //users_lock.insert(username.to_string(), tx.clone());
                             println!("你可以输出了，输出参数列表：");
                             for (user, tx) in users_lock.iter(){
                                 println!("用户：{}",user);
@@ -176,37 +206,10 @@ async fn handle_login(ws: WebSocket, users: add_user) {
                                 "username": username
                             });
 
-                            let add_msg = serde_json::json!({
-                                "type" : "add_user",
-                                "user": username
-                            });
-
                             // 发送登录成功响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
                                 eprintln!("Failed to send login_response message: {}", e);
                             }
-
-                            for(user, user_tx) in users_lock.iter(){
-                                if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
-                                    eprintln!("Failed to broadcast user list to {}:{}",user,e);
-                                }
-                            } 
-
-                            // 处理用户发送的消息。
-                            while let Some(result) = user_ws_rx.next().await {
-                                let message = match result {
-                                    Ok(msg) => msg,
-                                    Err(e) => {
-                                        eprintln!("WebSocket error: {}", e);
-                                        break;
-                                    }
-                                };
-
-                                user_message(username.to_string(), message, &users).await;
-                            }
-
-                            // 用户退出时，从用户列表中移除该用户。
-                            //users_lock.remove(username);
                         }
                     }
                 }
@@ -215,25 +218,3 @@ async fn handle_login(ws: WebSocket, users: add_user) {
     }
 }
 
-async fn user_message(username: String, msg: Message, users: &add_user) {
-    // 将消息转换为字符串并解析为 JSON。
-    if let Ok(msg_str) = msg.to_str() {
-        if let Ok(client_message) = serde_json::from_str::<Value>(msg_str) {
-            // 处理私聊消息。
-            if client_message["type"] == "private_message" {
-                if let Some(to) = client_message["to"].as_str() {
-                    if let Some(tx) = users.lock().await.get(&to.to_string()) {
-                        let new_msg = serde_json::json!({
-                            "type": "private_message",
-                            "from": username,
-                            "message": client_message["message"].as_str().unwrap_or(""),
-                            "timestamp": client_message["timestamp"].as_str().unwrap_or("")
-                        });
-                        // 发送私聊消息。
-                        let _ = tx.send(Ok(Message::text(new_msg.to_string())));
-                    }
-                }
-            }
-        }
-    }
-}
