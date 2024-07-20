@@ -34,13 +34,17 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 
 let chatHistory = new Array() // 保存聊天记录，{usersname(String): html标签}
 
-// todo test
-let userBlock = chatlist.firstElementChild.firstElementChild;
-userBlock.addEventListener('click', () => selectUser("user", userBlock));
+// // todo test
+// let userBlock = chatlist.firstElementChild.firstElementChild;
+// userBlock.addEventListener('click', () => selectUser("user", userBlock));
 
 
 ws_chat.onopen = function() {
     console.log('Connected to WebSocket');
+    // 发送用户名给服务端，以便让它记住
+    ws_chat.send(JSON.stringify({ 
+        "type": 'add_user',
+        "username": currentUser }));
 };
 
 // 收到服务器的消息
@@ -48,7 +52,7 @@ ws_chat.onmessage = function(event) {
     const data = JSON.parse(event.data);  // 使用json序列化与反序列化
     console.log('收到消息')  // todo: debug
     console.log(data)  // todo: debug
-    if (data["type"] === 'private_message') {   // 接收到私聊
+    if (data["type"] === 'private_message' || data["type"] === 'public_message') {   // 接收到信息
         boxAddMessage(data["from"], currentUser, data["message"], data["timestamp"]);
     }else if(data["type"] === 'add_user'){
         addUser(data["user"]);
@@ -160,9 +164,14 @@ function sendMessage() {
         console.log('发送消息'+message);  // todo debug
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
+        if(currentChatUser === "群聊"){
+            var message_type = 'public_message';
+        }else{
+            var message_type = 'private_message';
+        }
         // 发送消息
         ws_chat.send(JSON.stringify({ 
-            "type": 'private_message',
+            "type": message_type,
             "from": currentUser, 
             "to": currentChatUser, 
             "message": message, 
