@@ -98,18 +98,26 @@ function selectUser(user, userBlock) {
     // if (!currentChatUser){ 
     //     chatHistory[currentChatUser] = chatBox.innerHTML;
     // }
-    if(!currentChatUser){  //清除未读消息
-        userBlock.querySelector('.message_p').firstElementChild.nextElementSibling = ''
-    }
-    currentChatUser = user;
-    // chatUserName.innerText = user;  
-    // chatUserStatus.innerText = 'Online';
-    // chatUserImg.src = 'default.jpg';
-    if(!chatHistory && chatHistory.find(currentChatUser)){
-        chatBox.innerHTML = chatHistory[currentChatUser].innerHTML;
-    }
-    else{
-        chatBox.innerHTML = '';
+    if(currentChatUser!=user){  
+        //清除未读消息
+        var messageBox = userBlock.querySelector('.message_p');
+        if(messageBox){
+            var messageCount = messageBox.firstElementChild.nextElementSibling;
+            if(messageCount){
+                messageBox.removeChild(messageCount);
+            }
+        }
+        // 切换用户
+        currentChatUser = user;
+        // chatUserName.innerText = user;  
+        // chatUserStatus.innerText = 'Online';
+        // chatUserImg.src = 'default.jpg';
+        if(chatHistory.length && chatHistory.indexOf(currentChatUser)){
+            chatBox.innerHTML = chatHistory[currentChatUser].innerHTML;
+        }
+        else{
+            chatBox.innerHTML = '';
+        }
     }
 }
 
@@ -126,7 +134,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         var peerUser = sendUser;  // 对方
     }
     // 增加到对应的聊天历史里
-    if(!chatHistory && chatHistory.find(currentChatUser)){
+    if(!chatHistory.length && chatHistory.indexOf(currentChatUser)!=-1){
         chatHistory[peerUser].appendChild(messageDiv);
     }else{
         let history = document.createElement('div');
@@ -145,7 +153,13 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
             userlist[i].nextElementSibling.firstElementChild.innerText = message;  // 设置消息内容
             // 判断是否要显示未读
             if(peerUser !== currentChatUser){
-                userlist[i].nextElementSibling.firstElementChild.innerHTML = 1;
+                if(!userlist[i].nextElementSibling.firstElementChild.nextElementSibling){
+                    const messageCount = document.createElement('b');
+                    messageCount.innerHTML = 1;
+                    userlist[i].nextElementSibling.appendChild(messageCount);
+                }else{
+                    user_list[i].nextElementSibling.firstElementChild.nextElementSibling.innerHTML++;
+                }
             }
         }
     }
