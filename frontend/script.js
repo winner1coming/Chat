@@ -1,3 +1,22 @@
+// 客户端发给服务端的消息
+// request={ 
+//     "type": 'private_message',
+//     "from": currentUser, 
+//     "to": currentChatUser, 
+//     "message": message, 
+//     "timestamp": timestamp 
+// };
+// 服务端返回的响应
+// response={
+//     "type": 'private_message',
+//     "from": currentUser, 
+//     "message": message, 
+//     "timestamp": timestamp 
+// }
+// response={
+//     "type": 'private_message',
+//     "users": users, 
+// }
 const ws = new WebSocket('ws://127.0.0.1:3030/chat');
 let currentUser = localStorage.getItem('username');  // 自己的用户名
 let currentChatUser = null;   // 当前聊天的用户
@@ -18,10 +37,10 @@ ws.onopen = function() {
 // 收到服务器的消息
 ws.onmessage = function(event) {
     const data = JSON.parse(event.data);  // 使用json序列化与反序列化
-    if (data.type === 'private_message') {   // 接收到私聊
-        displayNewMessage(data.from, data.message, data.timestamp);
-    } else if (data.type === 'update_users') {  // 更新用户列表
-        updateUsersList(data.users);
+    if (data["type"] === 'private_message') {   // 接收到私聊
+        displayNewMessage(data["from"], data["message"], data["timestamp"]);
+    } else if (data["type"] === 'update_users') {  // 更新用户列表
+        updateUsersList(data["users"]);
     }
 };
 
@@ -81,7 +100,12 @@ function sendMessage() {
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         displayNewMessage(currentUser, message, timestamp);   // 在己方的对话框显示消息
         // 发送消息
-        ws.send(JSON.stringify({ type: 'private_message', from: currentUser, to: currentChatUser, message, timestamp }));
+        ws.send(JSON.stringify({ 
+            "type": 'private_message',
+            "from": currentUser, 
+            "to": currentChatUser, 
+            "message": message, 
+            "timestamp": timestamp }));
         messageInput.value = '';  //清空输入框
     }
 }
