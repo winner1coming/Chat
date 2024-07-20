@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Let's Chat!</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Let's Chat!</h2>
+        <input type="text" id="username" placeholder="Enter your username" required>
+        <button id="loginButton">Login</button>
+    </div>
+    <script >
+        const ws = new WebSocket('ws://127.0.0.1:3030/login');
+        ws.onopen = function() {
+            console.log('Connected to WebSocket');
+        };
+        ws.onmessage = function(event){
+            const data = JSON.parse(event.data);  // data中有success(bool)和username(string)
+            if (data.success) {
+                    localStorage.setItem('username', data.username);   // 设置用户名
+                    window.location.href = '127.0.0.1:3030/chat';
+                } else {
+                    alert('Username already taken. Please choose another one.');
+                }
+        };
+        // 登录部分
+        document.getElementById('loginButton').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            ws.send(JSON.stringify({ username }));
+        });
+
+        
+    </script>
+</body>
+</html>

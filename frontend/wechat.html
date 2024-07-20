@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+=======
 <html>
     <head>
         <meta name = "viewport" content="width=device-width,initial-scale=1.0">
@@ -25,7 +29,7 @@
                     </ul>
                 </div>
                 <!-- chat list 好友列表 -->
-                <div class="chatlist">
+                <div class="chatlist" id="chatlist">
                     <!-- 第一个 -->
                     <div class="block active">
                         <div class="imgbx">
@@ -115,65 +119,7 @@
                 </div>
             </div>
         </div>
-        <script>
-        //创建一个新的WebSocket连接到服务器地址 
-        const ws = new WebSocket('ws://127.0.0.1:3030/chat');
-        
-        //连接建立成功，输出连接成功消息
-        ws.onopen = () => {
-            console.log('Connected to the server');
-        };
-        
-        //从websocket接收信息
-        ws.onmessage = (event) => {
-            //获取HTML的chatBox_item，用于显示聊天消息
-            const chatBox = document.getElementById('chatBox_item');
-            //创建一个新的消息元素，显示来自服务器的消息
-            const message = `<div class="message friend_message"><p>${event.data}<br><span>12:15</span></p></div>`;
-            //将消息添加在聊天框的末尾
-            chatBox.insertAdjacentHTML('beforeend', message);
-        };
-
-        //监听按钮点击
-        document.getElementById('button').addEventListener('click', () => {
-            //获取输入框元素，用于输入消息
-            const input = document.getElementById('chat_context_item');
-            //获取输入框的消息内容
-            const message = input.value;
-            //消息不为空，发生信息给服务器
-            if (message) {
-                ws.send(message);
-                const chatBox = document.getElementById('chatBox_item');
-                //创建新的消息元素，显示用户自己发送的信息
-                const myMessage = `<div class="message my_message"><p>${message}<br><span>12:15</span></p></div>`;
-                chatBox.insertAdjacentHTML('beforeend', myMessage);
-                //清空聊天框内容
-                input.value = '';
-            }
-            /*
-            // 成功发送
-            var send_message = document.getElementById("chatBox_item");
-            var domBtm = document.getElementById("button");
-            // 发送内容
-            var message = document.getElementById("chat_context_item");
-            domBtm.addEventListener("click",function(){
-                var str = message.value;
-                var date = new Date();
-                var hour = date.getHours();
-                
-                var mm = date.getMinutes();
-                var time = hour+':'+ mm;
-                var ans = 
-                        '<div class = "message my_message"><p>'+str+'<br><span>'+time+'</span></p></div>'
-                        ;
-                var oLi = document.createElement("div")
-                oLi.setAttribute("class","my_message");
-                oLi.innerHTML = ans;
-                send_message.append(oLi);
-                message.value = "";
-                */
-            });
-        </script>
+        <script src="script.js"></script>
         <!-- 加载使用的web图标 -->
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
