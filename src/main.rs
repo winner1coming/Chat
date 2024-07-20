@@ -149,7 +149,8 @@ async fn handle_login(ws: WebSocket, users: Users) {
                         if users_lock.contains_key(username) {
                             let response = serde_json::json!({
                                 "type": "login_response",
-                                "success": false
+                                "success": false,
+                                "username": username
                             });
                             // 发送登录失败响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
