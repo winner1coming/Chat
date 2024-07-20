@@ -36,7 +36,12 @@
                     // // // 每更新登录一个用户，都要更新用户列表 todo(改为服务端在新用户上线时自动更新)
                     // ws.send(JSON.stringify({ 
                     //     "type": 'update_users'}));
-                    window.location.href = 'wechat.html';  // todo
+                    var pathname = window.location.pathname;
+                    if(pathname.search('html')==-1){
+                        window.location.href = 'wechat';
+                    }else{
+                        window.location.href = 'wechat.html';  
+                    }
                 } else {
                     alert('Username already taken. Please choose another one.');
                 }
