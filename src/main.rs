@@ -19,6 +19,25 @@ async fn main() {
     // 创建一个 `users` 过滤器，用于将 `users` 传递给 Warp 处理函数。
     let users_filter = warp::any().map(move || users.clone());
 
+
+    // 定义host:port/login可以导航到login.html
+    let login_route = warp::path("logining")
+        .and(warp::fs::file("./frontend/login.html"));
+    // 定义host:port/wechat可以导航到wechat.html
+    let wechat_route = warp::path("wechat")
+        .and(warp::fs::file("./frontend/wechat.html"));
+    // 静态文件
+    let static_files = warp::fs::dir("./frontend");
+
+    // 定义聊天 WebSocket 路径的处理函数。
+    let chat = warp::path("chat")
+        .and(warp::ws())
+        .and(users_filter.clone())
+        .map(|ws: warp::ws::Ws, users| {
+            // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
+            ws.on_upgrade(move |socket| user_connected(socket, users))
+        });
+    println!("你有进入到这个界面吗？？");
     // 定义登录 WebSocket 路径的处理函数。
     let login = warp::path("login")
         .and(warp::ws())
@@ -27,20 +46,11 @@ async fn main() {
             // 当 WebSocket 连接升级时，调用 `handle_login` 函数。
             ws.on_upgrade(move |socket| handle_login(socket, users))
         });
-
-    // 定义聊天 WebSocket 路径的处理函数。
-    let chat = warp::path("chat")
-    .and(warp::ws())
-    .and(users_filter.clone())
-    .map(|ws: warp::ws::Ws, users| {
-        // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
-        ws.on_upgrade(move |socket| user_connected(socket, users))
-    });
-    println!("你有进入到这个界面吗？？");
-
+  
+    let routes = login_route.or(wechat_route).or(chat).or(login).or(static_files);
 
     // 启动 Warp 服务器，监听 3030 端口。
-    warp::serve(login.or(chat)).run(([127, 0, 0, 1], 3030)).await;
+    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }
 
 async fn user_connected(ws: WebSocket, users: add_user) {
