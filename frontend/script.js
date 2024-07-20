@@ -77,8 +77,8 @@ document.getElementById('button').addEventListener('click', sendMessage);
 
 function sendMessage() {
     const message = messageInput.value;
-    if (message.trim() !== '' && currentChatUser) {
-        const timestamp = new Date().toLocaleTimeString();
+    if (!message && message.trim() !== '' && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
+        const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         displayNewMessage(currentUser, message, timestamp);   // 在己方的对话框显示消息
         // 发送消息
         ws.send(JSON.stringify({ type: 'private_message', from: currentUser, to: currentChatUser, message, timestamp }));

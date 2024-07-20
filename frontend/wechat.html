@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+=======
 <html>
     <head>
         <meta name = "viewport" content="width=device-width,initial-scale=1.0">
@@ -116,53 +120,6 @@
             </div>
         </div>
         <script src="script.js"></script>
-         <!-- <script>
-        //  const ws = new WebSocket('ws://127.0.0.1:3030/chat');
-        
-        // ws.onopen = () => {
-        //     console.log('Connected to the server');
-        // };
-        
-        // ws.onmessage = (event) => {
-        //     const chatBox = document.getElementById('chatBox_item');
-        //     const message = `<div class="message friend_message"><p>${event.data}<br><span>12:15</span></p></div>`;
-        //     chatBox.insertAdjacentHTML('beforeend', message);
-        // };
-
-        // document.getElementById('button').addEventListener('click', () => {
-        //     const input = document.getElementById('chat_context_item');
-        //     const message = input.value;
-        //     if (message) {
-        //         ws.send(message);
-        //         const chatBox = document.getElementById('chatBox_item');
-        //         const myMessage = `<div class="message my_message"><p>${message}<br><span>12:15</span></p></div>`;
-        //         chatBox.insertAdjacentHTML('beforeend', myMessage);
-        //         input.value = '';
-        //     }
-            /*
-            // 成功发送
-            var send_message = document.getElementById("chatBox_item");
-            var domBtm = document.getElementById("button");
-            // 发送内容
-            var message = document.getElementById("chat_context_item");
-            domBtm.addEventListener("click",function(){
-                var str = message.value;
-                var date = new Date();
-                var hour = date.getHours();
-                
-                var mm = date.getMinutes();
-                var time = hour+':'+ mm;
-                var ans = 
-                        '<div class = "message my_message"><p>'+str+'<br><span>'+time+'</span></p></div>'
-                        ;
-                var oLi = document.createElement("div")
-                oLi.setAttribute("class","my_message");
-                oLi.innerHTML = ans;
-                send_message.append(oLi);
-                message.value = "";
-                
-            });*/
-        </script>    -->
         <!-- 加载使用的web图标 -->
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

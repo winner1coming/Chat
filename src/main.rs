@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use futures::{SinkExt, StreamExt};
 
+
 /// 定义一个 `Users` 类型，它是一个线程安全的用户列表，
 /// 用 `Arc` 包裹的 `tokio::sync::Mutex`，内部包含一个 `HashMap`，
 /// 键是用户名，值是 `mpsc::UnboundedSender`，用于发送 WebSocket 消息。
@@ -20,6 +21,7 @@ async fn main() {
     let users_filter = warp::any().map(move || users.clone());
 
     // 定义聊天 WebSocket 路径的处理函数。
+
     let chat = warp::path("chat")
         .and(warp::ws())
         .and(users_filter.clone())
@@ -27,6 +29,7 @@ async fn main() {
             // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
             ws.on_upgrade(move |socket| user_connected(socket, users))
         });
+
 
     // 定义登录 WebSocket 路径的处理函数。
     let login = warp::path("login")
@@ -39,8 +42,10 @@ async fn main() {
 
     // 启动 Warp 服务器，监听 3030 端口。
     warp::serve(login.or(chat)).run(([127, 0, 0, 1], 3030)).await;
+
 }
 
+// 处理新用户连接的异步函数。
 async fn user_connected(ws: WebSocket, users: Users) {
     // 将 WebSocket 拆分成发送和接收部分。
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
@@ -185,7 +190,11 @@ async fn handle_login(ws: WebSocket, users: Users) {
     }
 }
 
+
+// 处理用户消息的异步函数。
+// 将接收到的消息格式化为 "用户名: 消息内容" 并广播给所有连接的用户。
 async fn user_message(username: String, msg: Message, users: &Users) {
+
     // 将消息转换为字符串并解析为 JSON。
     if let Ok(msg_str) = msg.to_str() {
         if let Ok(client_message) = serde_json::from_str::<Value>(msg_str) {
