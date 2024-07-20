@@ -24,7 +24,6 @@ async fn main() {
     // 创建一个 `users` 过滤器，用于将 `users` 传递给 Warp 处理函数。
     let users_filter = warp::any().map(move || users.clone());
 
-
     // 定义host:port/login可以导航到login.html
     let login_route = warp::path("logining")
         .and(warp::fs::file("./frontend/login.html"));
@@ -137,7 +136,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                 } else if client_message["type"] == "public_message" {
                     if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
                         let new_msg = serde_json::json!({
-                            "type": "p_message",
+                            "type": "public_message",
                             "from": client_message["from"].as_str(),
                             "message": msg,
                             "timestamp": client_message["timestamp"].as_str().unwrap_or("")
@@ -145,18 +144,13 @@ async fn user_connected(ws: WebSocket, users: add_user) {
 
                         let users_lock = users.lock().await;  // 获取 users 的锁
 
-                        // 将消息发送给指定的接收者
-                        if let Some(user_tx) = users_lock.get(to) {
-                            if let Err(e) = user_tx.send(Ok(Message::text(new_msg.to_string()))) {
-                                eprintln!("Failed to send public message to {}: {}", to, e);
-                            }
-                        }
-                        //所有用户都要收到
+                        // 将消息发送给所有在线用户
                         for (user, user_tx) in users_lock.iter(){
                             if let Err(e) = user_tx.send(Ok(Message::text(new_msg.to_string()))){
                                 eprintln!("Failed to broadcast user list to {}:{}",user,e);
                             }
                         }
+                        
                     }
                 }
             }
