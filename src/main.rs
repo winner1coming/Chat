@@ -6,7 +6,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use futures::{SinkExt, StreamExt};
 
-
 /// 定义一个 `Users` 类型，它是一个线程安全的用户列表，
 /// 用 `Arc` 包裹的 `tokio::sync::Mutex`，内部包含一个 `HashMap`，
 /// 键是用户名，值是 `mpsc::UnboundedSender`，用于发送 WebSocket 消息。
@@ -21,7 +20,6 @@ async fn main() {
     let users_filter = warp::any().map(move || users.clone());
 
     // 定义聊天 WebSocket 路径的处理函数。
-
     let chat = warp::path("chat")
         .and(warp::ws())
         .and(users_filter.clone())
@@ -29,7 +27,6 @@ async fn main() {
             // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
             ws.on_upgrade(move |socket| user_connected(socket, users))
         });
-
 
     // 定义登录 WebSocket 路径的处理函数。
     let login = warp::path("login")
@@ -42,10 +39,8 @@ async fn main() {
 
     // 启动 Warp 服务器，监听 3030 端口。
     warp::serve(login.or(chat)).run(([127, 0, 0, 1], 3030)).await;
-
 }
 
-// 处理新用户连接的异步函数。
 async fn user_connected(ws: WebSocket, users: Users) {
     // 将 WebSocket 拆分成发送和接收部分。
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
@@ -65,9 +60,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
     });
 
     // 为新连接的用户生成一个用户名（在实际应用中，这应该从客户端获取）。
-    let username = "userID".to_string();
-    // 将新用户及其 `UnboundedSender` 添加到用户列表中。
-    users.lock().await.insert(username.clone(), tx.clone());
+    let mut Name ="".to_string();
 
     // 处理来自 WebSocket 的消息。
     while let Some(result) = user_ws_rx.next().await {
@@ -83,6 +76,14 @@ async fn user_connected(ws: WebSocket, users: Users) {
         if let Ok(msg_str) = message.to_str() {
             if let Ok(client_message) = serde_json::from_str::<Value>(msg_str) {
                 // 处理私聊消息。
+                let username = client_message["from"].to_string();
+                Name = username.clone();
+                println!("目前的用户是：{}",Name);
+                // 将新用户及其 `UnboundedSender` 添加到用户列表中。
+                users.lock().await.insert(username.clone(), tx.clone());
+                for (user,tx) in users.lock().await.iter(){
+                    println!("所有的用户名：{}",user);
+                }
                 if client_message["type"] == "private_message" {
                     if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
                         let new_msg = serde_json::json!({
@@ -109,9 +110,8 @@ async fn user_connected(ws: WebSocket, users: Users) {
             }
         }
     }
-
     // 用户断开连接时，从用户列表中移除该用户。
-    users.lock().await.remove(&username);
+    users.lock().await.remove(&Name);
 }
 
 async fn handle_login(ws: WebSocket, users: Users) {
@@ -147,10 +147,13 @@ async fn handle_login(ws: WebSocket, users: Users) {
                         let mut users_lock = users.lock().await;
                         // 检查用户名是否已存在。
                         if users_lock.contains_key(username) {
+                            println!("重名了，你登陆不了的！我会返回一个false,此时的用户列表：");
+                            for (user, tx) in users_lock.iter(){
+                                println!("用户：{}",user);
+                            }
                             let response = serde_json::json!({
                                 "type": "login_response",
-                                "success": false,
-                                "username": username
+                                "success": false
                             });
                             // 发送登录失败响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
@@ -159,6 +162,10 @@ async fn handle_login(ws: WebSocket, users: Users) {
                         } else {
                             // 用户名不存在，允许登录并更新用户列表。
                             users_lock.insert(username.to_string(), tx.clone());
+                            println!("你可以输出了，输出参数列表：");
+                            for (user, tx) in users_lock.iter(){
+                                println!("用户：{}",user);
+                            }
                             let response = serde_json::json!({
                                 "type": "login_response",
                                 "success": true
@@ -182,7 +189,7 @@ async fn handle_login(ws: WebSocket, users: Users) {
                             }
 
                             // 用户退出时，从用户列表中移除该用户。
-                            users_lock.remove(username);
+                            //users_lock.remove(username);
                         }
                     }
                 }
@@ -191,11 +198,7 @@ async fn handle_login(ws: WebSocket, users: Users) {
     }
 }
 
-
-// 处理用户消息的异步函数。
-// 将接收到的消息格式化为 "用户名: 消息内容" 并广播给所有连接的用户。
 async fn user_message(username: String, msg: Message, users: &Users) {
-
     // 将消息转换为字符串并解析为 JSON。
     if let Ok(msg_str) = msg.to_str() {
         if let Ok(client_message) = serde_json::from_str::<Value>(msg_str) {
