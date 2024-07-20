@@ -24,7 +24,6 @@ async fn main() {
     // 创建一个 `users` 过滤器，用于将 `users` 传递给 Warp 处理函数。
     let users_filter = warp::any().map(move || users.clone());
 
-
     // 定义host:port/login可以导航到login.html
     let login_route = warp::path("logining")
         .and(warp::fs::file("./frontend/login.html"));
