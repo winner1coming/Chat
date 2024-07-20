@@ -51,9 +51,12 @@ ws_chat.onopen = function() {
 // 收到服务器的消息
 ws_chat.onmessage = function(event) {
     const data = JSON.parse(event.data);  // 使用json序列化与反序列化
-    if (data["type"] === 'private_message' || data["type"] === 'public_message') {   // 接收到信息
+    if (data["type"] === 'private_message') {   // 接收到信息
         boxAddMessage(data["from"], currentUser, data["message"], data["timestamp"]);
-    }else if(data["type"] === 'add_user'){
+    }else if( data["type"] === 'public_message'){
+        boxAddMessage(data["from"], "Group", data["message"], data["timestamp"]);
+    }
+    else if(data["type"] === 'add_user'){
         addUser(data["users"]);
     }
 };
@@ -113,6 +116,7 @@ function selectUser(user, userBlock) {
         // chatUserStatus.innerText = 'Online';
         // chatUserImg.src = 'default.jpg';
         if (chatHistory[currentChatUser]) {
+            chatBox.innerHTML = '';
             chatHistory[currentChatUser].forEach(messageHTML => {
                 chatBox.innerHTML += messageHTML;
             });
@@ -128,15 +132,27 @@ function selectUser(user, userBlock) {
 // 在聊天箱里增加新消息
 function boxAddMessage(sendUser, receiveUser, message, timestamp) {  
     const messageDiv = document.createElement('div');
-    messageDiv.innerHTML = `
-        <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
-            <p>${message}<br><span>${timestamp}</span></p>
-        </div>
-    `;
-    if(sendUser === currentUser){
-        var peerUser = receiveUser;  // 对方
+    if(receiveUser=="Group"){
+        messageDiv.innerHTML = `
+            <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
+                <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
+                    <img src="userimg.jpg" class="cover">
+                </div>
+                <p>${message}<br><span>${timestamp}</span></p>
+                <h4>${sendUser}</h4>
+            </div>
+            `;
     }else{
+        messageDiv.innerHTML = `
+            <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
+                <p>${message}<br><span>${timestamp}</span></p>
+            </div>
+        `;
+    }
+    if(receiveUser === currentUser){
         var peerUser = sendUser;  // 对方
+    }else{
+        var peerUser = receiveUser;  // 对方
     }
     // 增加到对应的聊天历史里
     if (!chatHistory[peerUser]) {
@@ -176,7 +192,9 @@ function sendMessage() {
     const message = messageInput.value;
     if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
-        boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
+        if(currentChatUser !="Group"){
+            boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
+        }
         if(currentChatUser === "Group"){
             var message_type = 'public_message';
         }else{
