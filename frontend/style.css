@@ -275,6 +275,11 @@ body
     border-radius: 20%;
     margin-right: 0px;
 }
+.message h4{
+    font-size: 0.8em;
+    color:#555 ;
+    margin-left: 14px;
+}
 .message p::before
 {
     content: '';
