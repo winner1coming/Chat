@@ -55,7 +55,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
             if let Ok(msg) = result {
                 // 尝试发送消息，如果失败则记录错误。
                 if let Err(e) = user_ws_tx.send(msg).await {
-                    eprintln!("Failed to send message: {}", e);
+                    eprintln!("(users_connect)Failed to send message: {}", e);
                 }
             }
         }
@@ -101,7 +101,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                         }
                     }
                 } else if client_message["type"] == "update_users" {
-                    // 处理用户列表更新消息。
+                    // 处理用户列表更新消息。//为了公聊而设置的
                     let users_list: Vec<String> = users.lock().await.keys().cloned().collect();
                     let update_msg = serde_json::json!({
                         "type" : "update_users",
@@ -113,7 +113,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
         }
     }
     // 用户断开连接时，从用户列表中移除该用户。
-    users.lock().await.remove(&username);
+    //users.lock().await.remove(&username);
 }
 
 async fn handle_login(ws: WebSocket, users: add_user) {
@@ -126,7 +126,7 @@ async fn handle_login(ws: WebSocket, users: add_user) {
             if let Ok(msg) = result {
                 // 尝试发送消息，如果失败则记录错误。
                 if let Err(e) = user_ws_tx.send(msg).await {
-                    eprintln!("Failed to send message: {}", e);
+                    eprintln!("(login_handle)Failed to send message: {}", e);
                 }
             }
         }
@@ -206,7 +206,7 @@ async fn handle_login(ws: WebSocket, users: add_user) {
                             }
 
                             // 用户退出时，从用户列表中移除该用户。
-                            users_lock.remove(username);
+                            //users_lock.remove(username);
                         }
                     }
                 }
