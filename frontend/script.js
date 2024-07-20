@@ -17,7 +17,11 @@
 //     "type": 'private_message',
 //     "users": users, 
 // }
-const ws = new WebSocket('ws://127.0.0.1:3030/chat');
+// 增加用户时={
+//      "type": 'add_user',
+//      "user": String
+// }
+const ws_chat = new WebSocket('ws://127.0.0.1:3030/chat');
 let currentUser = localStorage.getItem('username');  // 自己的用户名
 let currentChatUser = null;   // 当前聊天的用户
 
@@ -30,17 +34,17 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 
 let chatHistory = new Array() // 保存聊天记录，{usersname(String): html标签}
 
-// todo test
-let userBlock = chatlist.firstElementChild.firstElementChild;
-userBlock.addEventListener('click', () => selectUser("user", userBlock));
+// // todo test
+// let userBlock = chatlist.firstElementChild.firstElementChild;
+// userBlock.addEventListener('click', () => selectUser("user", userBlock));
 
 
-ws.onopen = function() {
+ws_chat.onopen = function() {
     console.log('Connected to WebSocket');
 };
 
 // 收到服务器的消息
-ws.onmessage = function(event) {
+ws_chat.onmessage = function(event) {
     const data = JSON.parse(event.data);  // 使用json序列化与反序列化
     console.log('收到消息')  // todo: debug
     console.log(data)  // todo: debug
@@ -150,7 +154,7 @@ function sendMessage() {
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
         // 发送消息
-        ws.send(JSON.stringify({ 
+        ws_chat.send(JSON.stringify({ 
             "type": 'private_message',
             "from": currentUser, 
             "to": currentChatUser, 
