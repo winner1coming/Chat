@@ -87,22 +87,24 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                     println!("所有的用户名：{}",user);
                 }*/
                 if client_message["type"] == "add_user" {
-                    let username = client_message["username"].to_string();
-                    Name = username.clone();
-                    println!("目前的用户是{}",Name);
-                    let mut user_lock = users.lock().await;
-                    user_lock.insert(Name, tx.clone());
-
-                    //设置广播信息
-                    let add_msg = serde_json::json!({
-                        "type" : "add_user",
-                        "user": username
-                    });
-                    for (user, user_tx) in user_lock.iter(){
+                    if let Some(username) = client_message["username"].as_str() {
+                        println!("目前的用户是{}", username);
+                        let mut user_lock = users.lock().await;
+                        user_lock.insert(username.to_string(), tx.clone());
+                
+                        // 设置广播信息
+                        let add_msg = serde_json::json!({
+                            "type": "add_user",
+                            "user": username
+                        });
+                        for (user, user_tx) in user_lock.iter(){
                         if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
                             eprintln!("Failed to broadcast user list to {}:{}",user,e);
                         }
                     }
+                    }
+
+                    
                 }else if client_message["type"] == "private_message" {
                     if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
                         let new_msg = serde_json::json!({
@@ -217,4 +219,3 @@ async fn handle_login(ws: WebSocket, users: add_user) {
         }
     }
 }
-
