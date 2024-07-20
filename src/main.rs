@@ -9,7 +9,7 @@ use futures::{SinkExt, StreamExt};
 /// 定义一个 `Users` 类型，它是一个线程安全的用户列表，
 /// 用 `Arc` 包裹的 `tokio::sync::Mutex`，内部包含一个 `HashMap`，
 /// 键是用户名，值是 `mpsc::UnboundedSender`，用于发送 WebSocket 消息。
-type Users = Arc<tokio::sync::Mutex<HashMap<String, mpsc::UnboundedSender<Result<Message, warp::Error>>>>>;
+type add_user = Arc<tokio::sync::Mutex<HashMap<String, mpsc::UnboundedSender<Result<Message, warp::Error>>>>>;
 
 #[tokio::main]
 async fn main() {
@@ -43,7 +43,7 @@ async fn main() {
     warp::serve(login.or(chat)).run(([127, 0, 0, 1], 3030)).await;
 }
 
-async fn user_connected(ws: WebSocket, users: Users) {
+async fn user_connected(ws: WebSocket, users: add_user) {
     // 将 WebSocket 拆分成发送和接收部分。
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
     // 创建一个不带缓冲区的通道，用于在任务间传递消息。
@@ -116,7 +116,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
     //users.lock().await.remove(&Name);
 }
 
-async fn handle_login(ws: WebSocket, users: Users) {
+async fn handle_login(ws: WebSocket, users: add_user) {
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
     let (tx, mut rx) = mpsc::unbounded_channel();
 
@@ -157,6 +157,7 @@ async fn handle_login(ws: WebSocket, users: Users) {
                                 "type": "login_response",
                                 "success": false
                             });
+
                             // 发送登录失败响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
                                 eprintln!("Failed to send login_response message: {}", e);
@@ -172,10 +173,22 @@ async fn handle_login(ws: WebSocket, users: Users) {
                                 "type": "login_response",
                                 "success": true
                             });
+
+                            let add_msg = serde_json::json!({
+                                "type" : "add_user",
+                                "user": username
+                            });
+
                             // 发送登录成功响应。
                             if let Err(e) = tx.send(Ok(Message::text(response.to_string()))) {
                                 eprintln!("Failed to send login_response message: {}", e);
                             }
+
+                            for(user, user_tx) in users_lock.iter(){
+                                if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
+                                    eprintln!("Failed to broadcast user list to {}:{}",user,e);
+                                }
+                            } 
 
                             // 处理用户发送的消息。
                             while let Some(result) = user_ws_rx.next().await {
@@ -200,7 +213,7 @@ async fn handle_login(ws: WebSocket, users: Users) {
     }
 }
 
-async fn user_message(username: String, msg: Message, users: &Users) {
+async fn user_message(username: String, msg: Message, users: &add_user) {
     // 将消息转换为字符串并解析为 JSON。
     if let Ok(msg_str) = msg.to_str() {
         if let Ok(client_message) = serde_json::from_str::<Value>(msg_str) {
