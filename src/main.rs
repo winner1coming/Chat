@@ -113,7 +113,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
         }
     }
     // 用户断开连接时，从用户列表中移除该用户。
-    //users.lock().await.remove(&Name);
+    users.lock().await.remove(&username);
 }
 
 async fn handle_login(ws: WebSocket, users: add_user) {
@@ -155,7 +155,8 @@ async fn handle_login(ws: WebSocket, users: add_user) {
                             }
                             let response = serde_json::json!({
                                 "type": "login_response",
-                                "success": false
+                                "success": false,
+                                "username": username
                             });
 
                             // 发送登录失败响应。
@@ -171,7 +172,8 @@ async fn handle_login(ws: WebSocket, users: add_user) {
                             }
                             let response = serde_json::json!({
                                 "type": "login_response",
-                                "success": true
+                                "success": true,
+                                "username": username
                             });
 
                             let add_msg = serde_json::json!({
@@ -204,7 +206,7 @@ async fn handle_login(ws: WebSocket, users: add_user) {
                             }
 
                             // 用户退出时，从用户列表中移除该用户。
-                            //users_lock.remove(username);
+                            users_lock.remove(username);
                         }
                     }
                 }
