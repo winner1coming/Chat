@@ -104,7 +104,7 @@ function selectUser(user, userBlock) {
     // chatUserStatus.innerText = 'Online';
     // chatUserImg.src = 'default.jpg';
     if(!chatHistory && chatHistory.find(currentChatUser)){
-        chatBox.innerHTML = chatHistory[currentChatUser];
+        chatBox.innerHTML = chatHistory[currentChatUser].innerHTML;
     }
     else{
         chatBox.innerHTML = '';
@@ -124,7 +124,14 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         var peerUser = sendUser;  // 对方
     }
     // 增加到对应的聊天历史里
-    chatHistory[peerUser].appendChild(messageDiv);
+    if(!chatHistory && chatHistory.find(currentChatUser)){
+        chatHistory[peerUser].appendChild(messageDiv);
+    }else{
+        let history = document.createElement('div');
+        chatHistory[peerUser] = history;
+        chatHistory[peerUser].appendChild(messageDiv);
+    }
+    
     // 在用户列表里显示新消息，
     // 拿到所有的用户块（用户块下有子节点用户名和消息时间
     //  ，其下一个兄弟节点的第一个子节点为消息，第二个表示是否未读，1表示为读）
@@ -141,7 +148,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         }
     }
     // 发送方即为当前的聊天方，在聊天箱里新增消息
-    if(currentChatUser === sendUser){  
+    if(currentChatUser === peerUser){  
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
