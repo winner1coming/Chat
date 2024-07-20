@@ -111,7 +111,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
     }
 
     // 用户断开连接时，从用户列表中移除该用户。
-    users.lock().await.remove(&username);
+    // users.lock().await.remove(&username);
 }
 
 async fn handle_login(ws: WebSocket, users: Users) {
@@ -182,7 +182,7 @@ async fn handle_login(ws: WebSocket, users: Users) {
                             }
 
                             // 用户退出时，从用户列表中移除该用户。
-                            users_lock.remove(username);
+                            // users_lock.remove(username);
                         }
                     }
                 }
