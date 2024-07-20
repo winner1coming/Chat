@@ -127,9 +127,10 @@ function selectUser(user, userBlock) {
 // 在聊天箱里增加新消息
 function boxAddMessage(sendUser, receiveUser, message, timestamp) {  
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${currentUser === sendUser ? 'my_message' : 'friend_message'}`;
     messageDiv.innerHTML = `
-        <p>${message}<br><span>${timestamp}</span></p>
+        <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
+            <p>${message}<br><span>${timestamp}</span></p>
+        </div>
     `;
     if(sendUser === currentUser){
         var peerUser = receiveUser;  // 对方
