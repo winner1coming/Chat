@@ -112,7 +112,7 @@ function selectUser(user, userBlock) {
         // chatUserName.innerText = user;  
         // chatUserStatus.innerText = 'Online';
         // chatUserImg.src = 'default.jpg';
-        if(chatHistory.length && chatHistory.indexOf(currentChatUser)!=-1){
+        if(chatHistory[currentChatUser]){
             chatBox.innerHTML = chatHistory[currentChatUser].innerHTML;
         }
         else{
@@ -137,12 +137,12 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         var peerUser = sendUser;  // 对方
     }
     // 增加到对应的聊天历史里
-    if(!chatHistory.length && chatHistory.indexOf(currentChatUser)!=-1){
+    if(chatHistory[peerUser]){
         chatHistory[peerUser].appendChild(messageDiv);
     }else{
         let history = document.createElement('div');
+        history.appendChild(messageDiv)
         chatHistory[peerUser] = history;
-        chatHistory[peerUser].appendChild(messageDiv);
     }
     
     // 在用户列表里显示新消息，
@@ -161,7 +161,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
                     messageCount.innerHTML = 1;
                     userlist[i].nextElementSibling.appendChild(messageCount);
                 }else{
-                    user_list[i].nextElementSibling.firstElementChild.nextElementSibling.innerHTML++;
+                    userlist[i].nextElementSibling.firstElementChild.nextElementSibling.innerHTML++;
                 }
             }
         }
