@@ -91,11 +91,12 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                         println!("目前的用户是{}", username);
                         let mut user_lock = users.lock().await;
                         user_lock.insert(username.to_string(), tx.clone());
+                        let names: Vec<String> = user_lock.keys().cloned().collect();
                 
                         // 设置广播信息
                         let add_msg = serde_json::json!({
                             "type": "add_user",
-                            "user": username
+                            "users": names
                         });
                         for (user, user_tx) in user_lock.iter(){
                         if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
