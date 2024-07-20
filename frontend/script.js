@@ -112,12 +112,15 @@ function selectUser(user, userBlock) {
         // chatUserName.innerText = user;  
         // chatUserStatus.innerText = 'Online';
         // chatUserImg.src = 'default.jpg';
-        if(chatHistory.length && chatHistory.indexOf(currentChatUser)){
+        if(chatHistory.length && chatHistory.indexOf(currentChatUser)!=-1){
             chatBox.innerHTML = chatHistory[currentChatUser].innerHTML;
         }
         else{
             chatBox.innerHTML = '';
         }
+        //切换名字
+        let name = document.getElementById("imgText");
+        name.firstElementChild.nextElementSibling.innerHTML = `<h4>${user}<br><span>Online</span></h4>`;
     }
 }
 
@@ -175,7 +178,7 @@ function sendMessage() {
     if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
-        if(currentChatUser === "群聊"){
+        if(currentChatUser === "Group"){
             var message_type = 'public_message';
         }else{
             var message_type = 'private_message';
