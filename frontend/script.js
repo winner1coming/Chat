@@ -34,9 +34,9 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 
 let chatHistory = new Array() // 保存聊天记录，{usersname(String): html标签}
 
-// // todo test
-// let userBlock = chatlist.firstElementChild.firstElementChild;
-// userBlock.addEventListener('click', () => selectUser("user", userBlock));
+// todo test
+let userBlock = chatlist.firstElementChild.firstElementChild;
+userBlock.addEventListener('click', () => selectUser("user", userBlock));
 
 
 ws_chat.onopen = function() {
@@ -85,7 +85,7 @@ function addUser(user){
                 </div>
             </div>
         `;
-        // userBlock.addEventListener('click', () => selectUser(user, userBlock));  todo 冲突
+        userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
         chatlist.firstElementChild.appendChild(userBlock);
     }
 }
@@ -149,7 +149,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
 
 function sendMessage() {
     const message = messageInput.value;
-    if (!message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
+    if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
         console.log('发送消息'+message);  // todo debug
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
         boxAddMessage(currentUser, currentChatUser, message, timestamp);   // 在己方的对话框显示消息
