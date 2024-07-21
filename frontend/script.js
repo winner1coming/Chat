@@ -141,10 +141,6 @@ function removeUser(user) {
 
 // 选择要聊天的用户
 function selectUser(user, userBlock) {
-    // 保存与上一个用户聊天的记录（deleted，因为boxAddMessage里会直接保存历史）
-    // if (!currentChatUser){ 
-    //     chatHistory[currentChatUser] = chatBox.innerHTML;
-    // }
     if(currentChatUser!=user){  
         //清除未读消息
         var messageBox = userBlock.querySelector('.message_p');
@@ -164,9 +160,12 @@ function selectUser(user, userBlock) {
         }else{
             chatBox.innerHTML = '';
         }
-        //切换名字
-        let name = document.getElementById("imgText");
-        name.firstElementChild.nextElementSibling.innerHTML = `<h4>${user}<br><span>Online</span></h4>`;
+        //切换图像与名字
+        let top_header = document.getElementById("imgText");
+        top_header.innerHTML = `<div class = "userimg">
+                                    <img src = "img${user_img[currentChatUser]}.jpg" class="cover">
+                                </div>
+                                <h4>${currentChatUser}<br><span></span></h4>`;
     }
 }
 
