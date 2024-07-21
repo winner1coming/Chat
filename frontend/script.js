@@ -23,7 +23,7 @@
 // }
 const ws_chat = new WebSocket('ws://127.0.0.1:3030/chat');
 const currentUser = localStorage.getItem('username');  // 自己的用户名
-let imageId = localStorage.getItem('image_id');  // 自己的头像编号
+let imageId = localStorage.getItem('imageId');  // 自己的头像编号
 let currentChatUser = null;   // 当前聊天的用户
 
 const chatlist = document.getElementById('chatlistbox');  // 好友列表
@@ -47,8 +47,15 @@ if(currentUser == "undefined"){
     }
 }
 let header = document.querySelector(".leftSide .header");
-header.firstElementChild.innerHTML = `<img src="img${imageId}.jpg" class="cover">`;
-header.firstElementChild.nextSibling.innerHTML = currentUser;
+header.innerHTML = `<div class="userimg">
+                        <img src="img${imageId}.jpg" class="cover">
+                    </div>
+                    <h4>${currentUser}</h4>
+                    <ul class="nav_icons">
+                        <li>
+                            <ion-icon name="chatbubble-ellipses"></ion-icon>
+                        </li>
+                    </ul>`;
 
 
 ws_chat.onopen = function() {
@@ -68,10 +75,10 @@ ws_chat.onmessage = function(event) {
         boxAddMessage(data["from"], "Group", data["message"], data["timestamp"]);
     }
     else if(data["type"] === 'add_user'){
-        addUser(data["users"]);
+        addUser(data["user_ids"]);
     }
     else if (data["type"] === 'user_remove'){
-        removeUser(data["users"]);
+        removeUser(data["user"]);
     }else if(data["type"] === 'history'){
         let history = data.history;
         imageId = history.imageId;
@@ -114,20 +121,19 @@ function addUser(users){
 }
 
 // 删除用户
-function removeUser(users) {
+function removeUser(user) {
     console.log('有用户下线');
-    user_list.forEach(function (user) {
-        if(!users.length || (users.length && users.indexOf(user)==-1)) {
-            let chatlist = document.querySelector('.chatlist').firstElementChild;
-            let chatList = chatlist.firstElementChild;
-            for (let i = 0; i < chatList.children.length; i++) {
-                if (chatList.children[i].querySelector('.listhead h4').innerText === user) {
-                    chatList.removeChild(chatList.children[i]);
-                    break;
-                }
-            }
+    // 删除映射
+    user_list.splice(user_list.indexOf(user));
+    // 删除用户列表中的用户
+    let chatlist = document.querySelector('.chatlist').firstElementChild;
+    let chatList = chatlist.firstElementChild;
+    for (let i = 0; i < chatList.children.length; i++) {
+        if (chatList.children[i].querySelector('.listhead h4').innerText === user) {
+            chatList.removeChild(chatList.children[i]);
+            break;
         }
-    });
+    }
     //可调用更新列表的函数
 }
 
