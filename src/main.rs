@@ -21,10 +21,21 @@ async fn main() {
     let users = Arc::new(tokio::sync::Mutex::new(HashMap::new()));
     let user_store = Arc::new(tokio::sync::Mutex::new(HashMap::new()));
     // 添加 "Group" 用户到用户列表
-    let mut user_lock = users.lock().await;
+      
     let (group_tx, _group_rx) = mpsc::unbounded_channel();
-    user_lock.insert("Group".to_string(), group_tx);
-    drop(user_lock); // 确保释放锁
+    {
+    let mut user_lock = users.lock().await; 
+    user_lock.insert("Group".to_string(), group_tx.clone());
+    }
+    
+    {
+        let mut store_lock = user_store.lock().await;
+        let group_id = user_ID.fetch_add(1, Ordering::SeqCst); // 获取下一个 ID
+        store_lock.insert(
+            "Group".to_string(),
+            ("default_password".to_string(), group_id, group_tx.clone()) // 使用默认密码
+        );
+    }
     
     // 创建一个 `users` 过滤器，用于将 `users` 传递给 Warp 处理函数。
     let users_filter = warp::any().map(move || users.clone());
