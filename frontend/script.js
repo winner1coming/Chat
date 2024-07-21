@@ -29,16 +29,13 @@ let currentChatUser = null;   // 当前聊天的用户
 const chatlist = document.getElementById('chatlistbox');  // 好友列表
 const chatBox = document.getElementById('chatBox_item');  // 右侧的聊天消息框
 const messageInput = document.getElementById('chat_context_item');  // 输入框
-// const chatUserName = document.getElementById('chat_user_name');  // 对方的用户名
-// const chatUserStatus = document.getElementById('chat_user_status');  // 是否在线
-// const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
 
 let chatHistory = new Array(); // 保存聊天记录，{usersname(String): html标签}
-let user_list = new Array(); 
-let user_img = new Array();
+let user_list = new Array();  // 用户名列表
+let user_img = new Array();  // 用户名与图片的映射
 
 // 判断头像和名字
-if(currentUser == "undefined"){
+if(currentUser == "undefined"){  // 还未登录
     alert("请先登录!");
     var pathname = window.location.pathname;
     if(pathname.search('html')==-1){
@@ -46,8 +43,9 @@ if(currentUser == "undefined"){
     }else{
         window.location.href = 'login.html';  
     }
-}
-let header = document.querySelector(".leftSide .header");
+} 
+// 为左上方添加自己的头像和名字
+let header = document.querySelector(".leftSide .header"); 
 header.innerHTML = `<div class="userimg">
                         <img src="img${imageId}.jpg" class="cover">
                     </div>
@@ -58,7 +56,7 @@ header.innerHTML = `<div class="userimg">
                         </li>
                     </ul>`;
 
-
+//websocket打开时的事件
 ws_chat.onopen = function() {
     console.log('Connected to WebSocket');
     // 发送用户名给服务端，以便让它记住
@@ -70,29 +68,29 @@ ws_chat.onopen = function() {
 // 收到服务器的消息
 ws_chat.onmessage = function(event) {
     const data = JSON.parse(event.data);  // 使用json序列化与反序列化
-    if (data["type"] === 'private_message') {   // 接收到信息
+    if (data["type"] === 'private_message') {   // 接收到私聊
         boxAddMessage(data["from"], currentUser, data["message"], data["timestamp"]);
-    }else if( data["type"] === 'public_message'){
+    }else if( data["type"] === 'public_message'){  // 公聊
         boxAddMessage(data["from"], "Group", data["message"], data["timestamp"]);
-    }
-    else if(data["type"] === 'add_user'){
+    }else if(data["type"] === 'add_user'){  // 增加用户
         addUser(data["users"]);
-    }
-    else if (data["type"] === 'user_remove'){
+    }else if (data["type"] === 'user_remove'){  // 删除用户
         removeUser(data["user"]);
-    }else if(data["type"] === 'history'){
-        let history = data.history;
-        imageId = history.imageId;
-        chatHistory = history.chatHistory;
+    }else if(data["type"] === 'history'){  // 接收历史记录
+        // 接收上次的文件历史
+        let history = JSON.parse(data.history);  // history由json序列化和反序列化
+        imageId = history.imageId;  // 自己的头像
+        chatHistory = history.chatHistory;  // 聊天记录
     }
 };
 
 // 增加新用户
 function addUser(users){
     console.log('有新用户上线') 
+    // 对于每个之前没有记录过的用户，在左侧用户列表增加用户块
     users.forEach(function (user) {  // user 1号是name，2号是图像编号
         if (user[0] !== currentUser)
-            if(!user_list.length || (user_list.length && user_list.indexOf(user[0])==-1)) {
+            if(!user_list.length || (user_list.length && user_list.indexOf(user[0])==-1)) {  // 判断是否记录过该用户
                 const userBlock = document.createElement('li');
                 userBlock.innerHTML = `
                     <div class="block active">
@@ -114,10 +112,11 @@ function addUser(users){
                         </div>
                     </div>
                 `;
+                // 为用户块增加点击事件，以便选择用户
                 userBlock.addEventListener('click', () => selectUser(user[0], userBlock));
-                chatlist.firstElementChild.appendChild(userBlock);
-                user_list.push(user[0]);
-                user_img[user[0]] = user[1];
+                chatlist.firstElementChild.appendChild(userBlock);   // 放入用户列表中
+                user_list.push(user[0]);   // 记录用户名
+                user_img[user[0]] = user[1];    // 记录用户名与头像的映射
             }
     });
 }
