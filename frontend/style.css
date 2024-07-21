@@ -65,10 +65,15 @@ body
     height: 60px ;
     background: #b1cdda;
     display: flex;
-    justify-content: space-between;
+    justify-content:flex-start;
     align-items: center;
     padding: 0 15px;
 
+}
+.header h4{
+    font-size: 1em;
+    color:#111 ;
+    margin-left: 14px;
 }
 .userimg
 {
@@ -103,6 +108,7 @@ body
     cursor:pointer ;
     color: #41baee;
     font-size: 1.5em;
+    margin-left: 190px;
 }
 /* 设置好友列表的样式 */
 .chatlist
