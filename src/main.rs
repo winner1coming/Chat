@@ -1,8 +1,11 @@
+use std::io::{BufWriter, Write};
+use std::path::Path;
 use serde_json::Value;
 use warp::Filter;
 use warp::ws::{Message, WebSocket};
 use tokio::sync::mpsc;
 use std::collections::HashMap;
+use std::fs::{self, File, OpenOptions};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use futures::{SinkExt, StreamExt};
@@ -137,8 +140,32 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                         if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
                             eprintln!("Failed to broadcast user list to {}:{}",user,e);
                         }
-                    }
-                    }
+                       }
+
+                       // 处理用户历史记录
+                       let file_path = format!("{}.json", username);
+                       if Path::new(&file_path).exists() {
+                           // 读取历史记录文件
+                           match fs::read_to_string(&file_path) {
+                               Ok(content) => {
+                                   if let Ok(history) = serde_json::from_str::<Value>(&content) {
+                                       let history_msg = serde_json::json!({
+                                           "type": "history",
+                                           "history": history
+                                       });
+                                       if let Err(e) = tx.send(Ok(Message::text(history_msg.to_string()))) {
+                                           eprintln!("发送历史数据失败 {}: {}", username, e);
+                                       }
+                                   } else {
+                                       eprintln!("无法代开历史文件 {}", username);
+                                   }
+                               }
+                               Err(e) => {
+                                   eprintln!("无法正确读取历史文件 {}: {}", username, e);
+                               }
+                           }
+                       }
+                 }
 
                 }else if client_message["type"] == "private_message" {
                     if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
@@ -179,6 +206,24 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                     let mut users_lock = users.lock().await;
                     users_lock.remove(user);
                     println!("{}",user);
+                    
+                    // 文件路径
+                    let file_path = format!("{}.json", user);
+
+                    // 获取并保存历史消息
+                    if let Some(history) = client_message.get("history") {
+                        // 将历史消息序列化为字符串
+                        let history_str = serde_json::to_string_pretty(&history).unwrap_or_default();
+                        
+                        // 打开或创建文件
+                        let file = OpenOptions::new().append(true).create(true).open(file_path).unwrap();
+                        let mut writer = BufWriter::new(file);
+
+                        // 写入历史消息
+                        if let Err(e) = writeln!(writer, "{}", history_str) {
+                            eprintln!("保存历史消息失败: {}", e);
+                        }
+                    }
 
                     let user_left_msg = serde_json::json!({
                         "type": "user_remove",
@@ -196,6 +241,8 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
         }
     }
 }
+
+
 
 async fn handle_login(ws: WebSocket, users: add_user, user_store: UserStore) {
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
@@ -286,7 +333,8 @@ async fn handle_login(ws: WebSocket, users: add_user, user_store: UserStore) {
                             }
                         }
                     }
-            } else if client_message["type"] == "register" {
+                
+                } else if client_message["type"] == "register" {
                     if let (Some(username), Some(password)) = (client_message["username"].as_str(), client_message["password"].as_str()) {
                         let mut user_store_lock = user_store.lock().await;
                         let user_id = user_ID.fetch_add(1, Ordering::SeqCst);
@@ -311,8 +359,8 @@ async fn handle_login(ws: WebSocket, users: add_user, user_store: UserStore) {
                             }
                         }
                     }
+                }
             }
         }
     }
-}
 }
