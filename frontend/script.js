@@ -47,6 +47,8 @@ if(currentUser == "undefined"){
     }
 }
 let header = document.querySelector(".leftSide .header");
+header.firstElementChild.innerHTML = `<img src="img${imageId}.jpg" class="cover">`;
+header.firstElementChild.nextSibling.innerHTML = currentUser;
 
 
 ws_chat.onopen = function() {
@@ -129,36 +131,6 @@ function removeUser(users) {
     //可调用更新列表的函数
 }
 
-// 刷新好友列表,其实添加用户也可以用这个用在添加好友的地方，但是不知道为什么删除这个地方用不上
-/*function refreshChatList() {
-    // 清空当前好友列表
-    const chatListContainer = document.querySelector('.chatlist').firstElementChild;
-    chatListContainer.innerHTML = '';
-    
-    // 重新加载用户列表
-    user_list.forEach(user => {
-        const userBlock = document.createElement('li');
-        userBlock.innerHTML = `
-            <div class="block active">
-                <div class="imgbx">
-                    <img src="img1.jpg" class="cover">
-                </div>
-                <div class="details">
-                    <div class="listhead">
-                        <h4>${user}</h4>
-                        <p class="time"></p>
-                    </div>
-                    <div class="message_p">
-                        <p></p>
-                    </div>
-                </div>
-            </div>
-        `;
-        userBlock.addEventListener('click', () => selectUser(user, userBlock));
-        chatListContainer.appendChild(userBlock);
-    });
-}*/
-
 // 选择要聊天的用户
 function selectUser(user, userBlock) {
     // 保存与上一个用户聊天的记录（deleted，因为boxAddMessage里会直接保存历史）
@@ -176,9 +148,6 @@ function selectUser(user, userBlock) {
         }
         // 切换用户
         currentChatUser = user;
-        // chatUserName.innerText = user;  
-        // chatUserStatus.innerText = 'Online';
-        // chatUserImg.src = 'default.jpg';
         if (chatHistory[currentChatUser]) {
             chatBox.innerHTML = '';
             chatHistory[currentChatUser].forEach(messageHTML => {
