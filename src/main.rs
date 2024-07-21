@@ -130,12 +130,17 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                                 }
                             })
                             .collect();
+                        println!("用户名");
+                        for i in user_ids.clone(){
+                            println!(" 用户名{}，ID{}\n",i.0,i.1);
+                        }
                         
                         // 设置广播信息
                         let add_msg = serde_json::json!({
                             "type": "add_user",
                             "users": user_ids
                         });
+
                         for (user, user_tx) in user_lock.iter(){
                         if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
                             eprintln!("Failed to broadcast user list to {}:{}",user,e);
@@ -207,8 +212,13 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                     users_lock.remove(user);
                     println!("{}",user);
                     
+                    let history_dir = "./chat_history";
+                    fs::create_dir_all(history_dir).unwrap_or_else(|e| {
+                        eprintln!("创建目录失败: {}", e);
+                    });
+
                     // 文件路径
-                    let file_path = format!("{}.json", user);
+                    let file_path = format!("{}/{}.json", history_dir, user);
 
                     // 获取并保存历史消息
                     if let Some(history) = client_message.get("history") {
@@ -216,7 +226,7 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                         let history_str = serde_json::to_string_pretty(&history).unwrap_or_default();
                         
                         // 打开或创建文件
-                        let file = OpenOptions::new().append(true).create(true).open(file_path).unwrap();
+                        let file = OpenOptions::new().write(true).create(true).open(file_path).unwrap();
                         let mut writer = BufWriter::new(file);
 
                         // 写入历史消息
