@@ -80,7 +80,9 @@ ws_chat.onmessage = function(event) {
         // 接收上次的文件历史
         let history = JSON.parse(data.history);  // history由json序列化和反序列化
         imageId = history.imageId;  // 自己的头像
-        chatHistory = history.chatHistory;  // 聊天记录
+        // 获取聊天记录，将二维数组转为字典
+        
+        chatHistory = Object.fromEntries(history.chatHistory);  // 聊天记录
     }
 };
 
@@ -152,9 +154,7 @@ function selectUser(user, userBlock) {
         currentChatUser = user;
         if (chatHistory[currentChatUser]) {
             chatBox.innerHTML = '';
-            chatHistory[currentChatUser].forEach(messageHTML => {
-                chatBox.innerHTML += messageHTML;
-            });
+            chatBox.innerHTML = chatHistory[currentChatUser];
         }else{
             chatBox.innerHTML = '';
         }
@@ -194,9 +194,9 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
     }
     // 增加到对应的聊天历史里
     if (!chatHistory[peerUser]) {
-        chatHistory[peerUser] = [];
+        chatHistory[peerUser] = "";
     }
-    chatHistory[peerUser].push(messageDiv.outerHTML);
+    chatHistory[peerUser]+=messageDiv.outerHTML;
     
     // 在用户列表里显示新消息，
     // 拿到所有的用户块（用户块下有子节点用户名和消息时间
@@ -228,6 +228,10 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
 
 // 发送消息
 function sendMessage() {
+    // 如果没有选择聊天用户
+    if(!currentChatUser){
+        alert("请选择您要聊天的好友");
+    }
     const message = messageInput.value;
     if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
         const timestamp = new Date().toLocaleTimeString();  // 获取时间戳
@@ -239,8 +243,8 @@ function sendMessage() {
         }else{
             var message_type = 'private_message';
         }
-        // 发送消息
 
+        // 发送消息
         ws_chat.send(JSON.stringify({ 
             "type": message_type,
             "from": currentUser, 
@@ -260,9 +264,11 @@ let isPageClosing = false;
 // 监听用户关闭页面
 window.addEventListener('beforeunload', function(event) {
     if (ws_chat.readyState === WebSocket.OPEN && !isPageClosing) {
+        // 将原来的chatHistory字典转为2维数组，方便由json进行序列化
+        const chat_entries = Object.entries(chatHistory);
         let history = JSON.stringify({
-            "image_id": imageId,
-            "chatHistory": chatHistory
+            "imageId": imageId,
+            "chatHistory": chat_entries
         })
         ws_chat.send(JSON.stringify({
             "type": "logout",
@@ -270,9 +276,9 @@ window.addEventListener('beforeunload', function(event) {
             "history": history
         }));
     }
-    // 让浏览器显示确认离开的对话框
-    event.preventDefault(); // 现代浏览器可能需要这行来触发提示
-    event.returnValue = ''; // 兼容老旧浏览器
+    // // 让浏览器显示确认离开的对话框  todo
+    // event.preventDefault(); // 现代浏览器可能需要这行来触发提示
+    // event.returnValue = ''; // 兼容老旧浏览器
 });
 
 // 监听用户实际关闭页面事件
