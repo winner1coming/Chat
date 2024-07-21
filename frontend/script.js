@@ -34,7 +34,8 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 // const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
 
 let chatHistory = new Array(); // 保存聊天记录，{usersname(String): html标签}
-let user_list = new Array();  
+let user_list = new Array(); 
+let user_img = new Array();
 
 // 判断头像和名字
 if(currentUser == "undefined"){
@@ -75,7 +76,7 @@ ws_chat.onmessage = function(event) {
         boxAddMessage(data["from"], "Group", data["message"], data["timestamp"]);
     }
     else if(data["type"] === 'add_user'){
-        addUser(data["user_ids"]);
+        addUser(data["users"]);
     }
     else if (data["type"] === 'user_remove'){
         removeUser(data["user"]);
@@ -89,20 +90,20 @@ ws_chat.onmessage = function(event) {
 // 增加新用户
 function addUser(users){
     console.log('有新用户上线') 
-    users.forEach(function (user) {
-        if (user !== currentUser)
-            if(!user_list.length || (user_list.length && user_list.indexOf(user)==-1)) {
+    users.forEach(function (user) {  // user 1号是name，2号是图像编号
+        if (user[0] !== currentUser)
+            if(!user_list.length || (user_list.length && user_list.indexOf(user[0])==-1)) {
                 const userBlock = document.createElement('li');
                 userBlock.innerHTML = `
                     <div class="block active">
                         <!-- 头像 -->
                         <div class="imgbx">
-                            <img src="img1.jpg" class="cover">
+                            <img src="img${user[1]}.jpg" class="cover">
                         </div>
                         <div class="details">
                             <div class="listhead">
                                 <!-- 显示上线人员的网名 -->
-                                <h4>${user}</h4>
+                                <h4>${user[0]}</h4>
                                 <!-- 显示消息时间 -->
                                 <p class="time"></p>
                             </div>
@@ -113,9 +114,10 @@ function addUser(users){
                         </div>
                     </div>
                 `;
-                userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
+                userBlock.addEventListener('click', () => selectUser(user[0], userBlock));
                 chatlist.firstElementChild.appendChild(userBlock);
-                user_list.push(user);
+                user_list.push(user[0]);
+                user_img[user[0]] = user[1];
             }
     });
 }
@@ -175,7 +177,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         messageDiv.innerHTML = `
             <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
                 <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
-                    <img src="userimg.jpg" class="cover">
+                    <img src="img${user_img[sendUser]}.jpg" class="cover">
                 </div>
                 <p>${message}<br><span>${timestamp}</span></p>
                 <h4>${sendUser}</h4>
