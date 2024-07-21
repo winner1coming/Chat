@@ -43,9 +43,10 @@ async fn main() {
     let chat = warp::path("chat")
         .and(warp::ws())
         .and(users_filter.clone())
-        .map(|ws: warp::ws::Ws, users| {
+        .and(store_filter.clone())
+        .map(|ws: warp::ws::Ws, users,user_store| {
             // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
-            ws.on_upgrade(move |socket| user_connected(socket, users))
+            ws.on_upgrade(move |socket| user_connected(socket, users, user_store))
         });
     println!("你有进入到这个界面吗？？");
     // 定义登录 WebSocket 路径的处理函数。
@@ -64,7 +65,7 @@ async fn main() {
     warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }
 
-async fn user_connected(ws: WebSocket, users: add_user) {
+async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
     // 将 WebSocket 拆分成发送和接收部分。
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
     // 创建一个不带缓冲区的通道，用于在任务间传递消息。
@@ -102,12 +103,24 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                     if let Some(username) = client_message["username"].as_str() {
                         println!("目前的用户是{}", username);
                         let mut user_lock = users.lock().await;
+                        let mut store_lock = user_store.lock().await;
                         user_lock.insert(username.to_string(), tx.clone());
-                        let name : Vec<String>= user_lock.keys().cloned().collect();
+                        // 获取所有用户的用户名和编号
+                        let name: Vec<String> = user_lock.keys().cloned().collect();
+                        let user_ids: Vec<(String, usize)> = store_lock.iter()
+                            .filter_map(|(user, (_, id, _))| {
+                                if name.contains(user) {
+                                    Some((user.clone(), *id))
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect();
+                        
                         // 设置广播信息
                         let add_msg = serde_json::json!({
                             "type": "add_user",
-                            "users": name
+                            "users": user_ids
                         });
                         for (user, user_tx) in user_lock.iter(){
                         if let Err(e) = user_tx.send(Ok(Message::text(add_msg.to_string()))){
