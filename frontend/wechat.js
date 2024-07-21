@@ -47,7 +47,7 @@ if(currentUser == "undefined"){  // 还未登录
 // 为左上方添加自己的头像和名字
 let header = document.querySelector(".leftSide .header"); 
 header.innerHTML = `<div class="userimg">
-                        <img src="img${imageId}.jpg" class="cover">
+                        <img src="img/img${imageId}.jpg" class="cover">
                     </div>
                     <h4>${currentUser}</h4>
                     <ul class="nav_icons">
@@ -98,7 +98,7 @@ function addUser(users){
                     <div class="block active">
                         <!-- 头像 -->
                         <div class="imgbx">
-                            <img src="img${user[1]}.jpg" class="cover">
+                            <img src="img/img${user[1]}.jpg" class="cover">
                         </div>
                         <div class="details">
                             <div class="listhead">
@@ -161,7 +161,7 @@ function selectUser(user, userBlock) {
         //切换图像与名字
         let top_header = document.getElementById("imgText");
         top_header.innerHTML = `<div class = "userimg">
-                                    <img src = "img${user_img[currentChatUser]}.jpg" class="cover">
+                                    <img src = "img/img${user_img[currentChatUser]}.jpg" class="cover">
                                 </div>
                                 <h4>${currentChatUser}<br><span></span></h4>`;
     }
@@ -174,7 +174,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         messageDiv.innerHTML = `
             <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
                 <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
-                    <img src="img${currentUser === sendUser ? imageId : user_img[sendUser]}.jpg" class="cover">
+                    <img src="img/img${currentUser === sendUser ? imageId : user_img[sendUser]}.jpg" class="cover">
                 </div>
                 <p>${message}<br><span>${timestamp}</span></p>
                 <h4>${sendUser}</h4>
