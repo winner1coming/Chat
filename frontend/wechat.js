@@ -166,8 +166,6 @@ function selectUser(user, userBlock) {
                                 <h4>${currentChatUser}<br><span></span></h4>`;
         // 使聊天条滚动至底部
         chatBox.scrollTop = chatBox.scrollHeight;
-        // 将选中的用户调至用户列表首位
-        userBlock.parentElement.prepend(userBlock);
     }
 }
 
@@ -281,9 +279,6 @@ window.addEventListener('beforeunload', function(event) {
             "history": history
         }));
     }
-    // // 让浏览器显示确认离开的对话框  todo
-    // event.preventDefault(); // 现代浏览器可能需要这行来触发提示
-    // event.returnValue = ''; // 兼容老旧浏览器
 });
 
 // 监听用户实际关闭页面事件
@@ -292,9 +287,9 @@ window.addEventListener('unload', function(event) {
 });
 
 // // 回车键发送消息（也可以删掉，让回车表换行）
-// messageInput.addEventListener('keypress', (e) => {
-//     if (e.key === 'Enter') {
-//         e.preventDefault();
-//         sendMessage();
-//     }
-// });
+messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+    }
+});
