@@ -76,7 +76,7 @@ async fn user_connected(ws: WebSocket, users: add_user) {
     });
 
     // 为新连接的用户生成一个用户名（在实际应用中，这应该从客户端获取）。
-    let mut Name ="".to_string();   
+    //let mut Name ="".to_string();   
 
     // 处理来自 WebSocket 的消息。
     while let Some(result) = user_ws_rx.next().await {
@@ -118,7 +118,6 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                     }
                     }
 
-                    
                 }else if client_message["type"] == "private_message" {
                     if let (Some(to), Some(msg)) = (client_message["to"].as_str(), client_message["message"].as_str()) {
                         let new_msg = serde_json::json!({
@@ -152,6 +151,24 @@ async fn user_connected(ws: WebSocket, users: add_user) {
                         }
                         
                     }
+                }
+                else if client_message["type"] == "logout" {
+                    let user = client_message["user"].as_str().unwrap_or("");
+                    let mut users_lock = users.lock().await;
+                    users_lock.remove(user);
+                    println!("{}",user);
+
+                    let user_left_msg = serde_json::json!({
+                        "type": "user_remove",
+                        "user": user
+                    });
+
+                    for (_, user_tx) in users_lock.iter() {
+                        if let Err(e) = user_tx.send(Ok(Message::text(user_left_msg.to_string()))) {
+                            eprintln!("Failed to notify user disconnected: {}", e);
+                        }
+                    }
+                    println!("有用户退出登录了：{}",user);
                 }
             }
         }
