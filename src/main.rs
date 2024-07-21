@@ -69,7 +69,7 @@ async fn main() {
             // 当 WebSocket 连接升级时，调用 `user_connected` 函数。
             ws.on_upgrade(move |socket| user_connected(socket, users, user_store))
         });
-    println!("你有进入到这个界面吗？？");
+    //局部测试println!("你有进入到这个界面吗？？");
     // 定义登录 WebSocket 路径的处理函数。
     let login = warp::path("login")
         .and(warp::ws())
