@@ -36,9 +36,17 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 let chatHistory = new Array(); // 保存聊天记录，{usersname(String): html标签}
 let user_list = new Array();  
 
-// // todo test
-// let userBlock = chatlist.firstElementChild.firstElementChild;
-// userBlock.addEventListener('click', () => selectUser("user", userBlock));
+// 判断头像和名字
+if(currentUser == "undefined"){
+    alert("请先登录!");
+    var pathname = window.location.pathname;
+    if(pathname.search('html')==-1){
+        window.location.href = 'login';
+    }else{
+        window.location.href = 'login.html';  
+    }
+}
+let header = document.querySelector(".leftSide .header");
 
 
 ws_chat.onopen = function() {
