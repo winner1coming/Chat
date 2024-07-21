@@ -12,7 +12,7 @@
         position:absolute;
         width: 99%;
         height: 98%;
-        background:url(chatbackground.jpg) no-repeat;
+        background:url(img/chatbackground.jpg) no-repeat;
         background-size: cover;
         /* 设置背景的不透明度 */
         opacity: 0.7;
@@ -123,85 +123,6 @@
             <input class="password" type="password" id="password" placeholder="Password">
             <button class="register" id="registerButton">Register</button>
         </div>
-    <script >
-        // 客户端发给服务端的消息：
-        // request={
-        //      "type":"login", 
-        //      "username": string 
-        //      "password": string
-        // }
-        //服务端返回的响应消息为：
-        // response={
-        //      "type": "login_response",
-        //      "success": true,
-        //      "username": str
-        //      "image_id": int
-        // }
-        // response={
-        //      "type": "login_response",
-        //      "success": false,
-        //      "error": str
-        // }
-        //
-        // 客户端发给服务端的消息：
-        // request={
-        //      "type":"register", 
-        //      "username": string 
-        //      "password": string
-        // }
-        //服务端返回的响应消息为：
-        // response={
-        //      "type": "register_response",
-        //      "success": bool
-        // }
-        const ws = new WebSocket('ws://127.0.0.1:3030/login');
-        ws.onopen = function() {
-            console.log('Connected to WebSocket');
-        };
-        ws.onmessage = function(event){
-            const data = JSON.parse(event.data);  // data中有success(bool)和username(string)
-            if(data.type === 'login_response'){
-                if (data.success) {
-                    localStorage.setItem('username', data.username);   // 设置用户名
-                    localStorage.setItem('imageId', data.image_id);   // 设置密码
-                    var pathname = window.location.pathname;
-                    if(pathname.search('html')==-1){
-                        window.location.href = 'wechat';
-                    }else{
-                        window.location.href = 'wechat.html';  
-                    }
-                }else {
-                    alert(data.error);
-                }
-            }else{
-                if (data.success) {
-                    alert('注册成功，请登录');
-                } else {
-                    alert('用户名已被占用，请更换用户名');
-                }
-            }
-            
-        };
-        // 登录部分
-        document.getElementById('loginButton').addEventListener('click', () => {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            ws.send(JSON.stringify({ "type":"login", "username": username, "password": password }));
-        });
-        // 注册部分
-        document.getElementById('registerButton').addEventListener('click', () => {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if(username == "undefined" || username == ""){
-                alert("请输入合法的用户名")
-            }else if(password == "" || password == "undefined"){
-                alert("请输入合法的密码")
-            }
-            else{
-                ws.send(JSON.stringify({ "type":"register", "username": username, "password": password }));
-            }
-        });
-        
-    </script>
+    <script src="login.js"></script>
 </body>
 </html>
