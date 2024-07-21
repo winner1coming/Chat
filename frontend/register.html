@@ -59,7 +59,6 @@
         // response={
         //      "type": "register_response",
         //      "success": bool
-        //      "image_id": int
         // }
         const ws = new WebSocket('ws://127.0.0.1:3030/login');
         ws.onopen = function() {
@@ -68,12 +67,11 @@
         ws.onmessage = function(event){
             const data = JSON.parse(event.data); 
             if (data.success) {
-                localStorage.setItem('username', data.username);   // 设置用户名
                 var pathname = window.location.pathname;
                 if(pathname.search('html')==-1){
-                    window.location.href = 'wechat';
+                    window.location.href = 'login';
                 }else{
-                    window.location.href = 'wechat.html';  
+                    window.location.href = 'login.html';  
                 }
             } else {
                 alert('用户名已被占用，请更换用户名');

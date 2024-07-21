@@ -22,7 +22,8 @@
 //      "user": String
 // }
 const ws_chat = new WebSocket('ws://127.0.0.1:3030/chat');
-let currentUser = localStorage.getItem('username');  // 自己的用户名
+const currentUser = localStorage.getItem('username');  // 自己的用户名
+let imageId = localStorage.getItem('image_id');  // 自己的头像编号
 let currentChatUser = null;   // 当前聊天的用户
 
 const chatlist = document.getElementById('chatlistbox');  // 好友列表
@@ -45,7 +46,7 @@ ws_chat.onopen = function() {
     // 发送用户名给服务端，以便让它记住
     ws_chat.send(JSON.stringify({ 
         "type": 'add_user',
-        "username": currentUser }));
+        "username": currentUser}));
 };
 
 // 收到服务器的消息
@@ -61,6 +62,10 @@ ws_chat.onmessage = function(event) {
     }
     else if (data["type"] === 'user_remove'){
         removeUser(data["users"]);
+    }else if(data["type"] === 'history'){
+        let history = data.history;
+        imageId = history.imageId;
+        chatHistory = history.chatHistory;
     }
 };
 
@@ -101,14 +106,13 @@ function addUser(users){
 // 删除用户
 function removeUser(users) {
     console.log('有用户下线');
-    users.forEach(function(user) {
-        let index = user_list.indexOf(user);
-        if (index !== -1) {
-            user_list.splice(index, 1);
+    user_list.forEach(function (user) {
+        if(!users.length || (users.length && users.indexOf(user)==-1)) {
             let chatlist = document.querySelector('.chatlist').firstElementChild;
-            for (let i = 0; i < chatlist.children.length; i++) {
-                if (chatlist.children[i].querySelector('.listhead h4').innerText === user) {
-                    chatlist.removeChild(chatlist.children[i]);
+            let chatList = chatlist.firstElementChild;
+            for (let i = 0; i < chatList.children.length; i++) {
+                if (chatList.children[i].querySelector('.listhead h4').innerText === user) {
+                    chatList.removeChild(chatList.children[i]);
                     break;
                 }
             }
@@ -240,6 +244,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
     }
 }
 
+// 发送消息
 function sendMessage() {
     const message = messageInput.value;
     if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
@@ -266,15 +271,21 @@ function sendMessage() {
 
 document.getElementById('button').addEventListener('click', sendMessage);
 
-//用于判断界面是否关闭
+// 关闭页面
+// 用于判断界面是否关闭
 let isPageClosing = false;
 
 // 监听用户关闭页面
 window.addEventListener('beforeunload', function(event) {
     if (ws_chat.readyState === WebSocket.OPEN && !isPageClosing) {
+        let history = JSON.stringify({
+            "image_id": imageId,
+            "chatHistory": chatHistory
+        })
         ws_chat.send(JSON.stringify({
-            type: "logout",
-            user: currentUser
+            "type": "logout",
+            "user": currentUser,
+            "history": history
         }));
     }
     // 让浏览器显示确认离开的对话框
@@ -287,10 +298,10 @@ window.addEventListener('unload', function(event) {
     isPageClosing = true; // 仅在用户关闭页面时标记
 });
 
-// 回车键发送消息（也可以删掉，让回车表换行）
-messageInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        sendMessage();
-    }
-});
+// // 回车键发送消息（也可以删掉，让回车表换行）
+// messageInput.addEventListener('keypress', (e) => {
+//     if (e.key === 'Enter') {
+//         e.preventDefault();
+//         sendMessage();
+//     }
+// });

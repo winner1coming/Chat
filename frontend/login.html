@@ -58,8 +58,14 @@
         //服务端返回的响应消息为：
         // response={
         //      "type": "login_response",
+        //      "success": true,
         //      "username": str
-        //      "success": bool
+        //      "image_id": int
+        // }
+        // response={
+        //      "type": "login_response",
+        //      "success": false,
+        //      "error": str
         // }
         const ws = new WebSocket('ws://127.0.0.1:3030/login');
         ws.onopen = function() {
@@ -69,6 +75,7 @@
             const data = JSON.parse(event.data);  // data中有success(bool)和username(string)
             if (data.success) {
                 localStorage.setItem('username', data.username);   // 设置用户名
+                localStorage.setItem('imageId', data.image_id);   // 设置密码
                 var pathname = window.location.pathname;
                 if(pathname.search('html')==-1){
                     window.location.href = 'wechat';
@@ -76,7 +83,7 @@
                     window.location.href = 'wechat.html';  
                 }
             } else {
-                alert('密码错误，请重新输入');
+                alert(data.error);
             }
         };
         // 登录部分
