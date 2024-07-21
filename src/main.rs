@@ -177,7 +177,7 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                                            eprintln!("发送历史数据失败 {}: {}", username, e);
                                        }
                                    } else {
-                                       eprintln!("无法代开历史文件 {}", username);
+                                       eprintln!("无法打开历史文件 {}", username);
                                    }
                                }
                                Err(e) => {
@@ -240,16 +240,17 @@ async fn user_connected(ws: WebSocket, users: add_user, user_store: UserStore) {
                     // 获取并保存历史消息
                     if let Some(history) = client_message.get("history") {
                         // 将历史消息序列化为字符串
-                        let history_str = serde_json::to_string_pretty(&history).unwrap_or_default();
+                        //let history_str = serde_json::to_string_pretty(&history).unwrap_or_default();
                         
                         // 打开或创建文件
                         let file = OpenOptions::new().write(true).create(true).open(file_path).unwrap();
                         let mut writer = BufWriter::new(file);
 
                         // 写入历史消息
-                        if let Err(e) = writeln!(writer, "{}", history_str) {
+                        if let Err(e) = writeln!(writer, "{}", history) {
                             eprintln!("保存历史消息失败: {}", e);
                         }
+
                     }
 
                     //编辑删除消息用于广播给所有在线客户端
