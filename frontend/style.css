@@ -259,6 +259,7 @@ body
     position: relative;
     /* 消息文字到右侧的距离 */
     left: 9px;
+    /* right: 10px; */
     /* right: 40px; */
     text-align: right;
     max-width: 65%;
@@ -273,7 +274,8 @@ body
     height: 40px;
     overflow: hidden;
     border-radius: 20%;
-    margin-right: 0px;
+    margin-right: 8px;
+    /* margin-left: 10px; */
 }
 .message h4{
     font-size: 0.8em;
