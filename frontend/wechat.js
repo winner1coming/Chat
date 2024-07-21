@@ -127,7 +127,7 @@ function addUser(users){
 function removeUser(user) {
     console.log('有用户下线');
     // 删除映射
-    user_list.splice(user_list.indexOf(user));
+    user_list.splice(user_list.indexOf(user),1);
     // 删除用户列表中的用户
     let chatList = document.querySelector('.chatlist').firstElementChild;
     for (let i = 0; i < chatList.children.length; i++) {
@@ -164,20 +164,25 @@ function selectUser(user, userBlock) {
                                     <img src = "img/img${user_img[currentChatUser]}.jpg" class="cover">
                                 </div>
                                 <h4>${currentChatUser}<br><span></span></h4>`;
+        // 使聊天条滚动至底部
+        chatBox.scrollTop = chatBox.scrollHeight;
+        // 将选中的用户调至用户列表首位
+        userBlock.parentElement.prepend(userBlock);
     }
 }
 
 // 在聊天箱里增加新消息
 function boxAddMessage(sendUser, receiveUser, message, timestamp) {  
     const messageDiv = document.createElement('div');
+    // 群组消息需增加头像
     if(receiveUser=="Group"){
         messageDiv.innerHTML = `
             <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
                 <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
                     <img src="img/img${currentUser === sendUser ? imageId : user_img[sendUser]}.jpg" class="cover">
+                    <h4>${sendUser}</h4>
                 </div>
                 <p>${message}<br><span>${timestamp}</span></p>
-                <h4>${sendUser}</h4>
             </div>
             `;
     }else{
