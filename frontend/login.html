@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Let's Chat!</title>
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 </head>
 <style>
-<<<<<<< HEAD
     .login-container::before
     {
         content: '';
@@ -30,7 +28,7 @@
         position: absolute;
         top: 200px;
         left: 800px;
-        height: 200px;
+        height: 210px;
         width: 350px;
         background-color: #acc3cd;
         align-items: center;
@@ -55,7 +53,20 @@
         left:90px;
         border-radius: 5px;
         width: 200px;
-        height: 20px;
+        height: 15px;
+        border: none;
+        padding: 5px;
+        font-family:'Times New Roman', Times, serif;
+        font-size: 0.9em;
+    }
+    .password
+    {
+        position: absolute;
+        top: 135px;
+        left:90px;
+        border-radius: 5px;
+        width: 200px;
+        height: 15px;
         border: none;
         padding: 5px;
         font-family:'Times New Roman', Times, serif;
@@ -63,7 +74,7 @@
     }
     .loginbtn{
         position: absolute;
-        top:150px;
+        top:170px;
         left: 145px;
         height: 20px;
         width: 100px;
@@ -73,8 +84,18 @@
         font-size: 1.1em;
         
     }
-    
-    
+    .register
+    {
+        position: absolute;
+        top:198px;
+        left: 145px;
+        height: 20px;
+        width: 100px;
+        border: none;
+        border-radius: 2px;
+        font-family: monospace;
+        font-size: 1.1em;
+    }  
 </style>
 <body>
     <div class="login-container">
@@ -83,51 +104,9 @@
             <h2>User Login</h2>
             <input class="username" type="text" id="username" placeholder="Enter your username" required>
             <button class="loginbtn" id="loginButton">Login</button>
+            <input class="password" type="password" id="password" placeholder="Password">
+            <button class="register" id="registerButton">Register</button>
         </div>
-=======
-     body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            background-color: #f4f4f4;
-    }
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 300px;
-        height: auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        background-color: #fff;
-    }
-    .container h2 {
-        margin-bottom: 20px;
-    }
-    .container input[type="text"],
-    .container input[type="password"],
-    .container button {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-    }
-</style>
-<body>
-    <div class="container">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button id="loginButton">Login</button>
-        <button id="registerButton">Register</button>
->>>>>>> 86a281d517d1cf0a594cae14f5df956e5147391d
-    </div>
     <script >
         // 客户端发给服务端的消息：
         // request={
