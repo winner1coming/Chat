@@ -59,6 +59,9 @@ ws_chat.onmessage = function(event) {
     else if(data["type"] === 'add_user'){
         addUser(data["users"]);
     }
+    else if (data["type"] === 'user_remove'){
+        removeUser(data["users"]);
+    }
 };
 
 // 增加新用户
@@ -92,8 +95,57 @@ function addUser(users){
                 chatlist.firstElementChild.appendChild(userBlock);
                 user_list.push(user);
             }
-    })
+    });
 }
+
+// 删除用户
+function removeUser(users) {
+    console.log('有用户下线');
+    users.forEach(function(user) {
+        let index = user_list.indexOf(user);
+        if (index !== -1) {
+            user_list.splice(index, 1);
+            let chatlist = document.querySelector('.chatlist').firstElementChild;
+            for (let i = 0; i < chatlist.children.length; i++) {
+                if (chatlist.children[i].querySelector('.listhead h4').innerText === user) {
+                    chatlist.removeChild(chatlist.children[i]);
+                    break;
+                }
+            }
+        }
+    });
+    //可调用更新列表的函数
+}
+
+// 刷新好友列表,其实添加用户也可以用这个用在添加好友的地方，但是不知道为什么删除这个地方用不上
+/*function refreshChatList() {
+    // 清空当前好友列表
+    const chatListContainer = document.querySelector('.chatlist').firstElementChild;
+    chatListContainer.innerHTML = '';
+    
+    // 重新加载用户列表
+    user_list.forEach(user => {
+        const userBlock = document.createElement('li');
+        userBlock.innerHTML = `
+            <div class="block active">
+                <div class="imgbx">
+                    <img src="img1.jpg" class="cover">
+                </div>
+                <div class="details">
+                    <div class="listhead">
+                        <h4>${user}</h4>
+                        <p class="time"></p>
+                    </div>
+                    <div class="message_p">
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        `;
+        userBlock.addEventListener('click', () => selectUser(user, userBlock));
+        chatListContainer.appendChild(userBlock);
+    });
+}*/
 
 // 选择要聊天的用户
 function selectUser(user, userBlock) {
@@ -213,6 +265,27 @@ function sendMessage() {
 }
 
 document.getElementById('button').addEventListener('click', sendMessage);
+
+//用于判断界面是否关闭
+let isPageClosing = false;
+
+// 监听用户关闭页面
+window.addEventListener('beforeunload', function(event) {
+    if (ws_chat.readyState === WebSocket.OPEN && !isPageClosing) {
+        ws_chat.send(JSON.stringify({
+            type: "logout",
+            user: currentUser
+        }));
+    }
+    // 让浏览器显示确认离开的对话框
+    event.preventDefault(); // 现代浏览器可能需要这行来触发提示
+    event.returnValue = ''; // 兼容老旧浏览器
+});
+
+// 监听用户实际关闭页面事件
+window.addEventListener('unload', function(event) {
+    isPageClosing = true; // 仅在用户关闭页面时标记
+});
 
 // 回车键发送消息（也可以删掉，让回车表换行）
 messageInput.addEventListener('keypress', (e) => {

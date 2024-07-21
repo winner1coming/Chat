@@ -65,10 +65,15 @@ body
     height: 60px ;
     background: #b1cdda;
     display: flex;
-    justify-content: space-between;
+    justify-content:flex-start;
     align-items: center;
     padding: 0 15px;
 
+}
+.header h4{
+    font-size: 1em;
+    color:#111 ;
+    margin-left: 14px;
 }
 .userimg
 {
@@ -103,6 +108,7 @@ body
     cursor:pointer ;
     color: #41baee;
     font-size: 1.5em;
+    margin-left: 190px;
 }
 /* 设置好友列表的样式 */
 .chatlist
@@ -259,6 +265,7 @@ body
     position: relative;
     /* 消息文字到右侧的距离 */
     left: 9px;
+    /* right: 10px; */
     /* right: 40px; */
     text-align: right;
     max-width: 65%;
@@ -273,7 +280,8 @@ body
     height: 40px;
     overflow: hidden;
     border-radius: 20%;
-    margin-right: 0px;
+    margin-right: 8px;
+    /* margin-left: 10px; */
 }
 .message h4{
     font-size: 0.8em;
