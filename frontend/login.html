@@ -194,7 +194,7 @@
             const password = document.getElementById('password').value;
             if(username == "undefined" || username == ""){
                 alert("请输入合法的用户名")
-            }else if(password == ""){
+            }else if(password == "" || password == "undefined"){
                 alert("请输入合法的密码")
             }
             else{
