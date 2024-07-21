@@ -127,8 +127,7 @@ function removeUser(user) {
     // 删除映射
     user_list.splice(user_list.indexOf(user));
     // 删除用户列表中的用户
-    let chatlist = document.querySelector('.chatlist').firstElementChild;
-    let chatList = chatlist.firstElementChild;
+    let chatList = document.querySelector('.chatlist').firstElementChild;
     for (let i = 0; i < chatList.children.length; i++) {
         if (chatList.children[i].querySelector('.listhead h4').innerText === user) {
             chatList.removeChild(chatList.children[i]);
@@ -175,7 +174,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         messageDiv.innerHTML = `
             <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
                 <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
-                    <img src="img${user_img[currentUser === sendUser ? currentUser : sendUser]}.jpg" class="cover">
+                    <img src="img${currentUser === sendUser ? imageId : user_img[sendUser]}.jpg" class="cover">
                 </div>
                 <p>${message}<br><span>${timestamp}</span></p>
                 <h4>${sendUser}</h4>
