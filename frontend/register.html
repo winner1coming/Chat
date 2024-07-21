@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Let's Chat!</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<style>
+     body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            background-color: #f4f4f4;
+    }
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 300px;
+        height: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+    }
+    .container h2 {
+        margin-bottom: 20px;
+    }
+    .container input[type="text"],
+    .container input[type="password"],
+    .container button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+</style>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="registerButton">Register</button>
+    </div>
+    <script >
+        // 客户端发给服务端的消息：
+        // request={
+        //      "type":"register", 
+        //      "username": string 
+        //      "password": string
+        // }
+        //服务端返回的响应消息为：
+        // response={
+        //      "type": "register_response",
+        //      "success": bool
+        // }
+        const ws = new WebSocket('ws://127.0.0.1:3030/login');
+        ws.onopen = function() {
+            console.log('Connected to WebSocket');
+        };
+        ws.onmessage = function(event){
+            const data = JSON.parse(event.data); 
+            if (data.success) {
+                var pathname = window.location.pathname;
+                if(pathname.search('html')==-1){
+                    window.location.href = 'login';
+                }else{
+                    window.location.href = 'login.html';  
+                }
+            } else {
+                alert('用户名已被占用，请更换用户名');
+            }
+        };
+        // 登录部分
+        document.getElementById('registerButton').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            ws.send(JSON.stringify({ "type":"register", "username": username, "password": password }));
+        });
+        
+    </script>
+</body>
+</html>

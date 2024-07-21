@@ -22,7 +22,8 @@
 //      "user": String
 // }
 const ws_chat = new WebSocket('ws://127.0.0.1:3030/chat');
-let currentUser = localStorage.getItem('username');  // 自己的用户名
+const currentUser = localStorage.getItem('username');  // 自己的用户名
+let imageId = localStorage.getItem('imageId');  // 自己的头像编号
 let currentChatUser = null;   // 当前聊天的用户
 
 const chatlist = document.getElementById('chatlistbox');  // 好友列表
@@ -33,11 +34,29 @@ const messageInput = document.getElementById('chat_context_item');  // 输入框
 // const chatUserImg = document.getElementById('chat_user_img');  // 对方的头像
 
 let chatHistory = new Array(); // 保存聊天记录，{usersname(String): html标签}
-let user_list = new Array();  
+let user_list = new Array(); 
+let user_img = new Array();
 
-// // todo test
-// let userBlock = chatlist.firstElementChild.firstElementChild;
-// userBlock.addEventListener('click', () => selectUser("user", userBlock));
+// 判断头像和名字
+if(currentUser == "undefined"){
+    alert("请先登录!");
+    var pathname = window.location.pathname;
+    if(pathname.search('html')==-1){
+        window.location.href = 'login';
+    }else{
+        window.location.href = 'login.html';  
+    }
+}
+let header = document.querySelector(".leftSide .header");
+header.innerHTML = `<div class="userimg">
+                        <img src="img${imageId}.jpg" class="cover">
+                    </div>
+                    <h4>${currentUser}</h4>
+                    <ul class="nav_icons">
+                        <li>
+                            <ion-icon name="chatbubble-ellipses"></ion-icon>
+                        </li>
+                    </ul>`;
 
 
 ws_chat.onopen = function() {
@@ -45,7 +64,7 @@ ws_chat.onopen = function() {
     // 发送用户名给服务端，以便让它记住
     ws_chat.send(JSON.stringify({ 
         "type": 'add_user',
-        "username": currentUser }));
+        "username": currentUser}));
 };
 
 // 收到服务器的消息
@@ -60,27 +79,31 @@ ws_chat.onmessage = function(event) {
         addUser(data["users"]);
     }
     else if (data["type"] === 'user_remove'){
-        removeUser(data["users"]);
+        removeUser(data["user"]);
+    }else if(data["type"] === 'history'){
+        let history = data.history;
+        imageId = history.imageId;
+        chatHistory = history.chatHistory;
     }
 };
 
 // 增加新用户
 function addUser(users){
     console.log('有新用户上线') 
-    users.forEach(function (user) {
-        if (user !== currentUser)
-            if(!user_list.length || (user_list.length && user_list.indexOf(user)==-1)) {
+    users.forEach(function (user) {  // user 1号是name，2号是图像编号
+        if (user[0] !== currentUser)
+            if(!user_list.length || (user_list.length && user_list.indexOf(user[0])==-1)) {
                 const userBlock = document.createElement('li');
                 userBlock.innerHTML = `
                     <div class="block active">
                         <!-- 头像 -->
                         <div class="imgbx">
-                            <img src="img1.jpg" class="cover">
+                            <img src="img${user[1]}.jpg" class="cover">
                         </div>
                         <div class="details">
                             <div class="listhead">
                                 <!-- 显示上线人员的网名 -->
-                                <h4>${user}</h4>
+                                <h4>${user[0]}</h4>
                                 <!-- 显示消息时间 -->
                                 <p class="time"></p>
                             </div>
@@ -91,68 +114,33 @@ function addUser(users){
                         </div>
                     </div>
                 `;
-                userBlock.addEventListener('click', () => selectUser(user, userBlock));  // todo 冲突
+                userBlock.addEventListener('click', () => selectUser(user[0], userBlock));
                 chatlist.firstElementChild.appendChild(userBlock);
-                user_list.push(user);
+                user_list.push(user[0]);
+                user_img[user[0]] = user[1];
             }
     });
 }
 
 // 删除用户
-function removeUser(users) {
+function removeUser(user) {
     console.log('有用户下线');
-    users.forEach(function(user) {
-        let index = user_list.indexOf(user);
-        if (index !== -1) {
-            user_list.splice(index, 1);
-            let chatlist = document.querySelector('.chatlist').firstElementChild;
-            for (let i = 0; i < chatlist.children.length; i++) {
-                if (chatlist.children[i].querySelector('.listhead h4').innerText === user) {
-                    chatlist.removeChild(chatlist.children[i]);
-                    break;
-                }
-            }
+    // 删除映射
+    user_list.splice(user_list.indexOf(user));
+    // 删除用户列表中的用户
+    let chatlist = document.querySelector('.chatlist').firstElementChild;
+    let chatList = chatlist.firstElementChild;
+    for (let i = 0; i < chatList.children.length; i++) {
+        if (chatList.children[i].querySelector('.listhead h4').innerText === user) {
+            chatList.removeChild(chatList.children[i]);
+            break;
         }
-    });
+    }
     //可调用更新列表的函数
 }
 
-// 刷新好友列表,其实添加用户也可以用这个用在添加好友的地方，但是不知道为什么删除这个地方用不上
-/*function refreshChatList() {
-    // 清空当前好友列表
-    const chatListContainer = document.querySelector('.chatlist').firstElementChild;
-    chatListContainer.innerHTML = '';
-    
-    // 重新加载用户列表
-    user_list.forEach(user => {
-        const userBlock = document.createElement('li');
-        userBlock.innerHTML = `
-            <div class="block active">
-                <div class="imgbx">
-                    <img src="img1.jpg" class="cover">
-                </div>
-                <div class="details">
-                    <div class="listhead">
-                        <h4>${user}</h4>
-                        <p class="time"></p>
-                    </div>
-                    <div class="message_p">
-                        <p></p>
-                    </div>
-                </div>
-            </div>
-        `;
-        userBlock.addEventListener('click', () => selectUser(user, userBlock));
-        chatListContainer.appendChild(userBlock);
-    });
-}*/
-
 // 选择要聊天的用户
 function selectUser(user, userBlock) {
-    // 保存与上一个用户聊天的记录（deleted，因为boxAddMessage里会直接保存历史）
-    // if (!currentChatUser){ 
-    //     chatHistory[currentChatUser] = chatBox.innerHTML;
-    // }
     if(currentChatUser!=user){  
         //清除未读消息
         var messageBox = userBlock.querySelector('.message_p');
@@ -164,9 +152,6 @@ function selectUser(user, userBlock) {
         }
         // 切换用户
         currentChatUser = user;
-        // chatUserName.innerText = user;  
-        // chatUserStatus.innerText = 'Online';
-        // chatUserImg.src = 'default.jpg';
         if (chatHistory[currentChatUser]) {
             chatBox.innerHTML = '';
             chatHistory[currentChatUser].forEach(messageHTML => {
@@ -175,9 +160,12 @@ function selectUser(user, userBlock) {
         }else{
             chatBox.innerHTML = '';
         }
-        //切换名字
-        let name = document.getElementById("imgText");
-        name.firstElementChild.nextElementSibling.innerHTML = `<h4>${user}<br><span>Online</span></h4>`;
+        //切换图像与名字
+        let top_header = document.getElementById("imgText");
+        top_header.innerHTML = `<div class = "userimg">
+                                    <img src = "img${user_img[currentChatUser]}.jpg" class="cover">
+                                </div>
+                                <h4>${currentChatUser}<br><span></span></h4>`;
     }
 }
 
@@ -188,7 +176,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         messageDiv.innerHTML = `
             <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
                 <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
-                    <img src="userimg.jpg" class="cover">
+                    <img src="img${user_img[sendUser]}.jpg" class="cover">
                 </div>
                 <p>${message}<br><span>${timestamp}</span></p>
                 <h4>${sendUser}</h4>
@@ -240,6 +228,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
     }
 }
 
+// 发送消息
 function sendMessage() {
     const message = messageInput.value;
     if (message && currentChatUser) {  // 判断message是否为空以及删去空格后是否为空，并且判断是否已经选了要发消息的对象
@@ -266,15 +255,21 @@ function sendMessage() {
 
 document.getElementById('button').addEventListener('click', sendMessage);
 
-//用于判断界面是否关闭
+// 关闭页面
+// 用于判断界面是否关闭
 let isPageClosing = false;
 
 // 监听用户关闭页面
 window.addEventListener('beforeunload', function(event) {
     if (ws_chat.readyState === WebSocket.OPEN && !isPageClosing) {
+        let history = JSON.stringify({
+            "image_id": imageId,
+            "chatHistory": chatHistory
+        })
         ws_chat.send(JSON.stringify({
-            type: "logout",
-            user: currentUser
+            "type": "logout",
+            "user": currentUser,
+            "history": history
         }));
     }
     // 让浏览器显示确认离开的对话框
@@ -287,10 +282,10 @@ window.addEventListener('unload', function(event) {
     isPageClosing = true; // 仅在用户关闭页面时标记
 });
 
-// 回车键发送消息（也可以删掉，让回车表换行）
-messageInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        sendMessage();
-    }
-});
+// // 回车键发送消息（也可以删掉，让回车表换行）
+// messageInput.addEventListener('keypress', (e) => {
+//     if (e.key === 'Enter') {
+//         e.preventDefault();
+//         sendMessage();
+//     }
+// });
