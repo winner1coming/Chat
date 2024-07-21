@@ -175,7 +175,7 @@ function boxAddMessage(sendUser, receiveUser, message, timestamp) {
         messageDiv.innerHTML = `
             <div class = "message ${currentUser === sendUser ? 'my_message' : 'friend_message'}">
                 <div class="${currentUser === sendUser ? 'righimg' : 'leftimg'}">
-                    <img src="img${user_img[sendUser]}.jpg" class="cover">
+                    <img src="img${user_img[currentUser === sendUser ? currentUser : sendUser]}.jpg" class="cover">
                 </div>
                 <p>${message}<br><span>${timestamp}</span></p>
                 <h4>${sendUser}</h4>
